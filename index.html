@@ -361,6 +361,21 @@ function streak(){
   return s;
 }
 
+function getMondayKey(ds){
+  const d=new Date(ds+'T00:00:00'), day=d.getDay();
+  const m=new Date(d); m.setDate(d.getDate()+(day===0?-6:1-day));
+  return m.toISOString().split('T')[0];
+}
+function wkRange(days){
+  const fl=days[0].label.replace(/^\S+ /,'');
+  const ll=days[days.length-1].label.replace(/^\S+ /,'');
+  const [fm]=fl.split(' '),[lm]=ll.split(' ');
+  return fm===lm?`${fl}–${ll.split(' ')[1]}`:`${fl}–${ll}`;
+}
+// Each plan week starts on a Friday — anchor its label to that calendar week
+const CAL_WK_LABEL={};
+plan.forEach((d,i)=>{ if(i===0||plan[i-1].week!==d.week) CAL_WK_LABEL[getMondayKey(d.date)]=WEEK_LABELS[d.week]; });
+
 function linReg(pts){
   const n=pts.length; if(n<2) return null;
   let sx=0,sy=0,sxy=0,sx2=0;
@@ -514,28 +529,29 @@ function unmarkTod(){
 function renderSessions(){
   const el=document.getElementById('sessions');
   const td=tod();
-  const openWk=byDate[td]?.week||1;
+  const todayMon=getMondayKey(td);
 
-  // Group by week
+  // Group by calendar week (Mon–Sun)
   const wkMap={};
-  plan.forEach(d=>{ (wkMap[d.week]=wkMap[d.week]||[]).push(d); });
+  plan.forEach(d=>{ const m=getMondayKey(d.date); (wkMap[m]=wkMap[m]||[]).push(d); });
 
   let h=`<div class="sec-title" style="margin-bottom:10px">14-Week Study Plan</div>`;
 
-  Object.keys(wkMap).sort((a,b)=>a-b).forEach(wk=>{
-    const days=wkMap[wk]; const wn=+wk;
+  Object.keys(wkMap).sort().forEach((mon,idx)=>{
+    const days=wkMap[mon]; const wn=idx+1;
     const active=days.filter(d=>!d.types.includes('rest'));
     const done=active.filter(d=>S.done[d.date]).length;
-    const isOpen=wn===openWk;
+    const isOpen=mon===todayMon;
+    const label=CAL_WK_LABEL[mon]||wkRange(days);
 
     h+=`<div class="week-card">
-      <div class="week-hdr" onclick="toggleWk(${wn})">
+      <div class="week-hdr" onclick="toggleWk('${mon}')">
         <span class="wk-num">WK ${String(wn).padStart(2,'0')}</span>
-        <span class="wk-title">${WEEK_LABELS[wn]}</span>
-        <span class="wk-dates">${done}/${active.length} · ${WEEK_DATES[wn]}</span>
-        <span class="chevron" id="ch${wn}" style="${isOpen?'transform:rotate(180deg)':''}">&#9660;</span>
+        <span class="wk-title">${label}</span>
+        <span class="wk-dates">${done}/${active.length} · ${wkRange(days)}</span>
+        <span class="chevron" id="ch${mon}" style="${isOpen?'transform:rotate(180deg)':''}">&#9660;</span>
       </div>
-      <div class="week-body${isOpen?' open':''}" id="wb${wn}">`;
+      <div class="week-body${isOpen?' open':''}" id="wb${mon}">`;
 
     days.forEach(d=>{
       const isToday=d.date===td;
