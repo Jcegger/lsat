@@ -306,7 +306,7 @@ function setSyncDot(state){
 }
 async function syncRemote(){
   setSyncDot('syncing');
-  const data={done:S.done,pts:S.pts,misses:S.misses,addendum:S.addendum,checklist:S.checklist};
+  const data={done:S.done,pts:S.pts,misses:S.misses};
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/state`,{
       method:'POST',
@@ -430,8 +430,6 @@ function renderDashboard(){
   const lastPT=S.pts.length?S.pts.slice().sort((a,b)=>a.num-b.num).slice(-1)[0]:null;
   const score=lastPT?lastPT.score:BASELINE;
   const gap=TARGET-score;
-  const dl=S.checklist.deadline;
-  const dtd=dl?daysUntil(dl):null;
   const isDone=entry&&S.done[td];
   const isRest=entry&&entry.types.includes('rest');
 
@@ -483,17 +481,6 @@ function renderDashboard(){
     </div>
   </div>`;
 
-  // Countdowns
-  h+=`<div class="countdowns">
-    <div class="cdcard">
-      <div class="cdnum" style="color:${dtt<14?'#DC2626':'var(--text)'}">${dtt}</div>
-      <div class="cdlabel">Days to test</div>
-    </div>
-    <div class="cdcard">
-      <div class="cdnum">${dtd!==null?dtd:'—'}</div>
-      <div class="cdlabel">${dl?'Days to app deadline':'App deadline not set'}</div>
-    </div>
-  </div>`;
 
   // Mini chart
   if(S.pts.length>0){
