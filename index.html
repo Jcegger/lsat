@@ -372,9 +372,18 @@ function wkRange(days){
   const [fm]=fl.split(' '),[lm]=ll.split(' ');
   return fm===lm?`${fl}–${ll.split(' ')[1]}`:`${fl}–${ll}`;
 }
-// Each plan week starts on a Friday — anchor its label to that calendar week
+// Label each calendar week by whichever plan week has the most days in it
 const CAL_WK_LABEL={};
-plan.forEach((d,i)=>{ if(i===0||plan[i-1].week!==d.week) CAL_WK_LABEL[getMondayKey(d.date)]=WEEK_LABELS[d.week]; });
+{
+  const tmp={};
+  plan.forEach(d=>{ const m=getMondayKey(d.date); (tmp[m]=tmp[m]||[]).push(d); });
+  Object.entries(tmp).forEach(([mon,days])=>{
+    const ct={};
+    days.forEach(d=>{ ct[d.week]=(ct[d.week]||0)+1; });
+    const dom=+Object.entries(ct).sort((a,b)=>b[1]-a[1])[0][0];
+    CAL_WK_LABEL[mon]=WEEK_LABELS[dom]||'';
+  });
+}
 
 function linReg(pts){
   const n=pts.length; if(n<2) return null;
