@@ -142,6 +142,9 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
   <button data-tab="misses">Misses</button>
   <button data-tab="addendum">Addendum</button>
   <button data-tab="checklist">Checklist</button>
+  <span style="display:flex;align-items:center;margin-left:auto;padding-right:12px;flex-shrink:0">
+    <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;cursor:default" title="Connecting..."></span>
+  </span>
 </nav>
 
 <main>
@@ -283,6 +286,11 @@ const TEST_DATE = '2026-08-08';
 const TARGET    = 167;
 const BASELINE  = 151;
 
+// ── SUPABASE ───────────────────────────────────────────────────────────────
+const SUPA_URL = 'https://gnujcqoyjovhqkquwapd.supabase.co';
+const SUPA_KEY = 'sb_publishable_U9pC2YEA9YB2KxPog6t3SA_T03Jid1g';
+const SUPA_ID  = 'jay';
+
 // ── STORAGE ────────────────────────────────────────────────────────────────
 function load(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;} }
 function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
@@ -294,7 +302,45 @@ const S = {
   addendum: load('addendum',{text:'',saved:null}),
   checklist:load('checklist',{items:{},deadline:''}),
 };
-function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist); }
+function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist); syncRemote(); }
+
+function setSyncDot(state){
+  const d=document.getElementById('sync-dot'); if(!d) return;
+  const c={syncing:'#FCD34D',ok:'#4ADE80',err:'#F87171'};
+  d.style.background=c[state]||'#ccc';
+  d.title=state==='ok'?'Synced':state==='syncing'?'Syncing...':'Sync error — saved locally';
+}
+async function syncRemote(){
+  setSyncDot('syncing');
+  const data={done:S.done,pts:S.pts,misses:S.misses,addendum:S.addendum,checklist:S.checklist};
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/state`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${SUPA_KEY}`,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:SUPA_ID,data}),
+    });
+    setSyncDot(r.ok?'ok':'err');
+  }catch{ setSyncDot('err'); }
+}
+async function loadRemote(){
+  setSyncDot('syncing');
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/state?id=eq.${SUPA_ID}&select=data`,{
+      headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${SUPA_KEY}`},
+    });
+    const rows=await r.json();
+    if(rows.length&&rows[0].data){
+      const d=rows[0].data;
+      if(d.done)      S.done=d.done;
+      if(d.pts)       S.pts=d.pts;
+      if(d.misses)    S.misses=d.misses;
+      if(d.addendum)  S.addendum=d.addendum;
+      if(d.checklist) S.checklist=d.checklist;
+      save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist);
+    }
+    setSyncDot('ok');
+  }catch{ setSyncDot('err'); }
+}
 
 // ── UTILS ──────────────────────────────────────────────────────────────────
 function tod(){ return new Date().toISOString().split('T')[0]; }
@@ -940,7 +986,7 @@ document.querySelectorAll('nav button').forEach(btn=>{
 });
 
 // ── INIT ───────────────────────────────────────────────────────────────────
-renderDashboard();
+(async()=>{ await loadRemote(); renderDashboard(); })();
 </script>
 </body>
 </html>
