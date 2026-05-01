@@ -372,18 +372,23 @@ function wkRange(days){
   const [fm]=fl.split(' '),[lm]=ll.split(' ');
   return fm===lm?`${fl}–${ll.split(' ')[1]}`:`${fl}–${ll}`;
 }
-// Label each calendar week by whichever plan week has the most days in it
-const CAL_WK_LABEL={};
-{
-  const tmp={};
-  plan.forEach(d=>{ const m=getMondayKey(d.date); (tmp[m]=tmp[m]||[]).push(d); });
-  Object.entries(tmp).forEach(([mon,days])=>{
-    const ct={};
-    days.forEach(d=>{ ct[d.week]=(ct[d.week]||0)+1; });
-    const dom=+Object.entries(ct).sort((a,b)=>b[1]-a[1])[0][0];
-    CAL_WK_LABEL[mon]=WEEK_LABELS[dom]||'';
-  });
-}
+const CAL_WK_LABEL={
+  '2026-04-27':'PowerScore Chs 1–4: RC fundamentals',
+  '2026-05-04':'Chs 5–6: LR question types + CondR',
+  '2026-05-11':'Chs 7–9: full passages + comparative',
+  '2026-05-18':'Ch 10: section strategy + PT #1',
+  '2026-05-25':'PT #1 review + first timed sections',
+  '2026-06-01':'Timed sections + PT #2',
+  '2026-06-08':'PT #2 review + RC speed',
+  '2026-06-15':'Section drilling + PT #3 midpoint',
+  '2026-06-22':'PT #3 review + section stamina',
+  '2026-06-29':'Stamina wrap-up + PT #4',
+  '2026-07-06':'PT #4 review + PT #5',
+  '2026-07-13':'PT #5 review + PT #6 final',
+  '2026-07-20':'PT #6 review + sharpen',
+  '2026-07-27':'Confidence reps + wind down',
+  '2026-08-03':'Test week — Aug 8',
+};
 
 function linReg(pts){
   const n=pts.length; if(n<2) return null;
