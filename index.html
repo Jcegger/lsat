@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LSAT — Jay</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F6F2;--card:#fff;--border:#E8E6E0;--text:#1a1a1a;--muted:#888;--faint:#bbb;
+  --purple:#6D28D9;--purple-lt:#EDE9FE;--purple-border:#C4B5FD;
+  --green:#166534;--green-lt:#DCFCE7;
+  --blue:#1D4ED8;--blue-lt:#DBEAFE;
+  --amber:#92400E;--amber-lt:#FEF3C7;
+  --pink:#9D174D;--pink-lt:#FCE7F3;
+  --gray:#666;--gray-lt:#F1F0EC;
+  --yellow:#713F12;--yellow-lt:#FEF9C3;
+  --red:#991B1B;--red-lt:#FEE2E2;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+body{max-width:680px;margin:0 auto;display:flex;flex-direction:column}
+.mono{font-family:'DM Mono',monospace}
+
+nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:none;padding:11px 13px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+nav button.active{color:var(--purple);border-bottom-color:var(--purple)}
+nav button:hover:not(.active){color:var(--text)}
+
+main{flex:1;padding:14px}
+.section{display:none}.section.active{display:block}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.card-sm{padding:12px}
+.sec-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px;text-align:center}
+.stat-num{font-family:'DM Mono',monospace;font-size:22px;font-weight:500}
+.stat-label{font-size:10px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.stat-sub{font-size:10px;color:var(--faint);margin-top:1px}
+
+.tag{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;letter-spacing:.03em;display:inline-block;vertical-align:middle}
+.tag-book{background:var(--purple-lt);color:var(--purple)}
+.tag-rc{background:var(--blue-lt);color:var(--blue)}
+.tag-lr{background:var(--green-lt);color:var(--green)}
+.tag-condr{background:var(--yellow-lt);color:var(--yellow)}
+.tag-pt{background:var(--amber-lt);color:var(--amber)}
+.tag-review{background:var(--pink-lt);color:var(--pink)}
+.tag-rest{background:var(--gray-lt);color:var(--gray)}
+
+.btn{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.82}
+.btn-primary{background:var(--purple);color:#fff}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-sm{padding:5px 9px;font-size:11px}
+.btn-danger{background:var(--red-lt);color:var(--red)}
+.btn-success{background:var(--green-lt);color:var(--green)}
+
+.countdowns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cdcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.cdnum{font-family:'DM Mono',monospace;font-size:26px;font-weight:500}
+.cdlabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:4px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--purple)}
+textarea{resize:vertical;min-height:80px;line-height:1.55}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.week-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.week-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;transition:background .15s}
+.week-hdr:hover{background:#FAFAF8}
+.wk-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--faint);min-width:40px;letter-spacing:.04em}
+.wk-title{font-size:13px;font-weight:500;flex:1}
+.wk-dates{font-family:'DM Mono',monospace;font-size:10px;color:var(--faint)}
+.chevron{font-size:9px;color:var(--faint);transition:transform .2s;margin-left:4px}
+.week-body{border-top:1px solid var(--border);display:none}
+.week-body.open{display:block}
+
+.day-row{display:grid;grid-template-columns:78px 1fr 26px;gap:8px;padding:9px 14px;border-bottom:1px solid #F5F4F0;align-items:start}
+.day-row:last-child{border-bottom:none}
+.day-row.is-today{background:#F5F3FF}
+.day-row.is-rest{opacity:.55}
+.day-dname{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);padding-top:1px;line-height:1.4}
+.day-task{font-size:13px;line-height:1.5;margin-bottom:3px}
+.day-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.day-note-text{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic}
+.note-row{display:flex;gap:6px;margin-top:7px}
+.note-row input{flex:1;min-width:0;padding:6px 9px;font-size:12px}
+.note-row button{padding:6px 10px;font-size:12px;white-space:nowrap}
+.check-btn{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.check-btn.done{background:var(--green);border-color:var(--green);color:#fff}
+.check-btn:hover:not(.done){border-color:var(--green)}
+
+.chart-wrap{width:100%;height:180px;margin:4px 0 0}
+svg.ptchart{width:100%;height:100%;overflow:visible}
+
+.miss-item{display:flex;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid #F5F4F0}
+.miss-item:last-child{border-bottom:none}
+.miss-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0}
+.miss-meta{font-size:11px;color:var(--muted)}
+
+.weak-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F5F4F0}
+.weak-row:last-child{border-bottom:none}
+.weak-name{font-family:'DM Mono',monospace;font-size:11px;min-width:130px}
+.weak-bar-bg{flex:1;background:#F1F0EC;border-radius:4px;height:7px;overflow:hidden}
+.weak-bar{height:100%;border-radius:4px;background:var(--pink);transition:width .3s}
+.weak-ct{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:28px;text-align:right}
+
+.addendum-area{width:100%;min-height:320px;border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;background:var(--card);outline:none;resize:vertical;color:var(--text)}
+.addendum-meta{display:flex;justify-content:space-between;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--faint)}
+
+.cl-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F5F4F0}
+.cl-item:last-child{border-bottom:none}
+.cl-check{width:18px;height:18px;flex-shrink:0;cursor:pointer;accent-color:var(--purple)}
+.cl-label{font-size:14px;flex:1}
+.cl-label.done{text-decoration:line-through;color:var(--muted)}
+
+.snote{padding:9px 0;border-bottom:1px solid #F5F4F0}
+.snote:last-child{border-bottom:none}
+.snote-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);margin-bottom:2px}
+.snote-text{font-size:13px;line-height:1.45}
+
+.empty{text-align:center;padding:36px 16px;color:var(--faint);font-size:13px}
+
+@media(max-width:400px){
+  .form2{grid-template-columns:1fr}
+  .weak-name{min-width:100px}
+  nav button{padding:10px 10px;font-size:9px}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <button class="active" data-tab="dashboard">Dashboard</button>
+  <button data-tab="sessions">Sessions</button>
+  <button data-tab="pt">PT Scores</button>
+  <button data-tab="misses">Misses</button>
+  <button data-tab="addendum">Addendum</button>
+  <button data-tab="checklist">Checklist</button>
+</nav>
+
+<main>
+  <div id="dashboard" class="section active"></div>
+  <div id="sessions"  class="section"></div>
+  <div id="pt"        class="section"></div>
+  <div id="misses"    class="section"></div>
+  <div id="addendum"  class="section"></div>
+  <div id="checklist" class="section"></div>
+</main>
+
+<script>
+// ── PLAN DATA ──────────────────────────────────────────────────────────────
+// [date, label, task, types[], week]
+const PLAN_RAW = [
+['2026-05-01','Fri May 1','Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35).',['book'],1],
+['2026-05-02','Sat May 2','Ch 3: VIEWSTAMP. Most important chapter. Take notes, do all drills.',['book'],1],
+['2026-05-03','Sun May 3','Finish Ch 3 if needed. Ch 4: Passage Elements & Formations. Do recognition drill (p.141).',['book'],1],
+['2026-05-04','Mon May 4','20 untimed CondR questions on 7Sage — multi-link chains only. Bring misses to Claude.',['condr'],1],
+['2026-05-05','Tue May 5','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach.',['book'],1],
+['2026-05-06','Wed May 6','20 untimed mixed LR (all types). Let 7Sage analytics surface what\'s slipping. Bring misses to Claude.',['lr'],1],
+['2026-05-07','Thu May 7','Rest.',['rest'],1],
+['2026-05-08','Fri May 8','Ch 6 pt 1 (pp.179–200): question stems, location element, types overview. Do Location Designation Drill (p.183).',['book'],2],
+['2026-05-09','Sat May 9','Ch 6 pt 2 (pp.201–246): Must Be True, Strengthen, Weaken, all subtypes. Do Identify the Question Stem Drill (p.191).',['book'],2],
+['2026-05-10','Sun May 10','2 untimed 7Sage RC passages. Apply question type recognition from Ch 6. Bring misses to Claude.',['rc'],2],
+['2026-05-11','Mon May 11','20 untimed CondR — Inverse Fallacy and contrapositive chains. Bring misses to Claude.',['condr'],2],
+['2026-05-12','Tue May 12','Ch 7: Putting It All Together (pp.249–289). Do both practice passages (PT 122 + PT 121).',['book'],2],
+['2026-05-13','Wed May 13','20 untimed mixed LR. Are the same question types slipping week over week? Bring to Claude.',['lr'],2],
+['2026-05-14','Thu May 14','Rest.',['rest'],2],
+['2026-05-15','Fri May 15','Ch 8: Comparative Reading (pp.291–329). Do both comparative practice passages.',['book'],3],
+['2026-05-16','Sat May 16','Ch 9 pt 1 (pp.331–373): Diversity + Law passages. Do diversity practice (p.348) and law practice (p.365).',['book'],3],
+['2026-05-17','Sun May 17','Ch 9 pt 2 (pp.375–399): Science passages. Do science practice (p.389). Then 1 untimed 7Sage science passage.',['book','rc'],3],
+['2026-05-18','Mon May 18','20 untimed CondR — CausR traps (correlation, reverse causation, alternative cause, confounding variable). Bring misses to Claude.',['condr'],3],
+['2026-05-19','Tue May 19','3 untimed 7Sage RC passages — mix of all passage types. Passage map required for each.',['rc'],3],
+['2026-05-20','Wed May 20','20 untimed mixed LR. Identify if same question types keep slipping. Bring pattern to Claude.',['lr'],3],
+['2026-05-21','Thu May 21','Rest.',['rest'],3],
+['2026-05-22','Fri May 22','Ch 10: Section Strategy & Management (pp.401–431). Study "Plus 2" Timing Formula and pacing guidelines carefully.',['book'],4],
+['2026-05-23','Sat May 23','20 untimed CondR — last targeted session before PT #1. How are the chains feeling?',['condr'],4],
+['2026-05-24','Sun May 24','Practice Test #1 — full timed PT. Home, ethernet, phone off. First real benchmark.',['pt'],4],
+['2026-05-25','Mon May 25','PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude.',['review'],4],
+['2026-05-26','Tue May 26','Targeted drilling on PT #1 weak areas. Claude will direct.',['review'],4],
+['2026-05-27','Wed May 27','20 untimed mixed LR.',['lr'],4],
+['2026-05-28','Thu May 28','Rest.',['rest'],4],
+['2026-05-29','Fri May 29','Timed RC section (35 min). Keep passage mapping — just do it faster.',['rc'],5],
+['2026-05-30','Sat May 30','Review timed RC. Where did time go? Which passage hurt most? Bring to Claude.',['review'],5],
+['2026-05-31','Sun May 31','Timed RC section. Target ~8 min per passage.',['rc'],5],
+['2026-06-01','Mon Jun 1','Timed LR section (35 min). Note which question types slow you down.',['lr'],5],
+['2026-06-02','Tue Jun 2','25 untimed CondR — are the chains clicking under untimed conditions? Bring misses to Claude.',['condr'],5],
+['2026-06-03','Wed Jun 3','Review both timed sections from weekend. Categorize all misses. Bring to Claude.',['review'],5],
+['2026-06-04','Thu Jun 4','Rest.',['rest'],5],
+['2026-06-05','Fri Jun 5','Timed RC section. Try to finish with 2 min to spare — skip and return if stuck.',['rc'],6],
+['2026-06-06','Sat Jun 6','25 untimed mixed LR. Target 90%+ accuracy. Bring misses to Claude.',['lr'],6],
+['2026-06-07','Sun Jun 7','Practice Test #2 — full timed PT.',['pt'],6],
+['2026-06-08','Mon Jun 8','PT #2 review — full breakdown to Claude. Compare to PT #1. Is LR floor rising?',['review'],6],
+['2026-06-09','Tue Jun 9','Targeted drilling on PT #2 weak areas.',['review'],6],
+['2026-06-10','Wed Jun 10','Timed LR section. Track anything over 90 sec.',['lr'],6],
+['2026-06-11','Thu Jun 11','Rest.',['rest'],6],
+['2026-06-12','Fri Jun 12','2 timed RC passages. Target: under 9 min each.',['rc'],7],
+['2026-06-13','Sat Jun 13','PowerScore RC Passage ReChallenge (p.435) — redo the book\'s passages under timed conditions.',['book'],7],
+['2026-06-14','Sun Jun 14','Timed RC section. Is your mapping getting leaner?',['rc'],7],
+['2026-06-15','Mon Jun 15','Timed LR section + full review. Bring misses to Claude.',['lr'],7],
+['2026-06-16','Tue Jun 16','25 untimed CondR — whatever chain or fallacy type is still slipping. Bring to Claude.',['condr'],7],
+['2026-06-17','Wed Jun 17','Review week\'s RC misses. Comprehension or question-type errors? Bring to Claude.',['review'],7],
+['2026-06-18','Thu Jun 18','Rest.',['rest'],7],
+['2026-06-19','Fri Jun 19','Timed RC section. Aim to finish with time to check answers.',['rc'],8],
+['2026-06-20','Sat Jun 20','Timed LR section.',['lr'],8],
+['2026-06-21','Sun Jun 21','Practice Test #3 — full timed PT. Midpoint benchmark.',['pt'],8],
+['2026-06-22','Mon Jun 22','PT #3 full review — bring to Claude. Are we trending toward 162?',['review'],8],
+['2026-06-23','Tue Jun 23','Targeted drilling based on PT #3 misses.',['review'],8],
+['2026-06-24','Wed Jun 24','Light mixed LR — 15 questions, untimed, confidence only.',['lr'],8],
+['2026-06-25','Thu Jun 25','Rest.',['rest'],8],
+['2026-06-26','Fri Jun 26','Back-to-back timed sections: RC then LR with 10-min break. Build multi-section stamina.',['rc','lr'],9],
+['2026-06-27','Sat Jun 27','Review both sections. Where did errors cluster — early, middle, or late?',['review'],9],
+['2026-06-28','Sun Jun 28','Back-to-back: LR then RC. Does order affect which section suffers?',['lr','rc'],9],
+['2026-06-29','Mon Jun 29','25 untimed CondR — any persistent chain errors from Phase 2. Bring to Claude.',['condr'],9],
+['2026-06-30','Tue Jun 30','Untimed RC passages — comprehension focus only.',['rc'],9],
+['2026-07-01','Wed Jul 1','Bring week\'s misses to Claude for pattern diagnosis.',['review'],9],
+['2026-07-02','Thu Jul 2','Rest.',['rest'],9],
+['2026-07-03','Fri Jul 3','Timed LR section.',['lr'],10],
+['2026-07-04','Sat Jul 4','Rest — holiday.',['rest'],10],
+['2026-07-05','Sun Jul 5','Practice Test #4 — full timed PT.',['pt'],10],
+['2026-07-06','Mon Jul 6','PT #4 full review — bring to Claude. Scores stabilizing above 160?',['review'],10],
+['2026-07-07','Tue Jul 7','Targeted drilling on PT #4 misses.',['review'],10],
+['2026-07-08','Wed Jul 8','Timed RC section.',['rc'],10],
+['2026-07-09','Thu Jul 9','Rest.',['rest'],10],
+['2026-07-10','Fri Jul 10','Mixed timed drilling — 20 LR + 1 timed RC passage.',['lr','rc'],11],
+['2026-07-11','Sat Jul 11','Untimed drilling on persistent weak areas.',['review'],11],
+['2026-07-12','Sun Jul 12','Practice Test #5 — full timed PT.',['pt'],11],
+['2026-07-13','Mon Jul 13','PT #5 full review — bring to Claude.',['review'],11],
+['2026-07-14','Tue Jul 14','Targeted drilling on PT #5 misses.',['review'],11],
+['2026-07-15','Wed Jul 15','Timed LR section. Skip and return on anything over 90 sec.',['lr'],11],
+['2026-07-16','Thu Jul 16','Rest.',['rest'],11],
+['2026-07-17','Fri Jul 17','Timed RC section.',['rc'],12],
+['2026-07-18','Sat Jul 18','Timed LR section.',['lr'],12],
+['2026-07-19','Sun Jul 19','Practice Test #6 — treat exactly like test day. Final full PT.',['pt'],12],
+['2026-07-20','Mon Jul 20','PT #6 full review — final diagnostic. What\'s left to fix?',['review'],12],
+['2026-07-21','Tue Jul 21','Targeted drilling on PT #6 misses. No new strategies — fix known errors only.',['review'],12],
+['2026-07-22','Wed Jul 22','Light mixed LR, untimed.',['lr'],12],
+['2026-07-23','Thu Jul 23','Rest.',['rest'],12],
+['2026-07-24','Fri Jul 24','Targeted drilling on whatever PT #6 exposed. Bring to Claude first.',['review'],13],
+['2026-07-25','Sat Jul 25','Timed LR section. Goal: no rushing at the end.',['lr'],13],
+['2026-07-26','Sun Jul 26','Timed RC section. Goal: complete all 4 passages.',['rc'],13],
+['2026-07-27','Mon Jul 27','20 untimed LR — confidence reps only.',['lr'],13],
+['2026-07-28','Tue Jul 28','2 untimed RC passages. No pressure. Stay sharp.',['rc'],13],
+['2026-07-29','Wed Jul 29','Rest.',['rest'],13],
+['2026-07-30','Thu Jul 30','Rest.',['rest'],13],
+['2026-07-31','Fri Jul 31','15 untimed LR — easy questions, confidence only.',['lr'],14],
+['2026-08-01','Sat Aug 1','1 untimed RC passage. Light. Done in 20 min.',['rc'],14],
+['2026-08-02','Sun Aug 2','10 untimed LR — stay warm.',['lr'],14],
+['2026-08-03','Mon Aug 3','Rest. Confirm test day logistics: ethernet, headphones, ID, water.',['rest'],14],
+['2026-08-04','Tue Aug 4','Rest.',['rest'],14],
+['2026-08-05','Wed Aug 5','Rest.',['rest'],14],
+['2026-08-06','Thu Aug 6','Rest.',['rest'],14],
+['2026-08-07','Fri Aug 7','No studying. Sleep early. Done.',['rest'],14],
+['2026-08-08','Sat Aug 8','Test day. Fordham.',['pt'],14],
+];
+
+const WEEK_LABELS = {
+  1:'Chs 1–5: how to read + LR begins',2:'Ch 6: questions + drilling',
+  3:'Chs 8–9: comparative + passage themes',4:'Ch 10 + PT #1',
+  5:'First timed RC + timed LR',6:'Stamina + PT #2',
+  7:'RC mapping speed + ReChallenge',8:'PT #3 — midpoint check',
+  9:'Section stamina',10:'PT #4',11:'PT #5',12:'PT #6 — final full PT',
+  13:'Sharpen, don\'t rebuild',14:'Final week + test day'
+};
+const WEEK_DATES = {
+  1:'May 1–7',2:'May 8–14',3:'May 15–21',4:'May 22–28',
+  5:'May 29–Jun 4',6:'Jun 5–11',7:'Jun 12–18',8:'Jun 19–25',
+  9:'Jun 26–Jul 2',10:'Jul 3–9',11:'Jul 10–16',12:'Jul 17–23',
+  13:'Jul 24–30',14:'Jul 31–Aug 8'
+};
+
+const plan = PLAN_RAW.map(([date,label,task,types,week])=>({date,label,task,types,week}));
+const byDate = {};
+plan.forEach(d=>{ byDate[d.date]=d; });
+
+// ── CONSTANTS ──────────────────────────────────────────────────────────────
+const TEST_DATE = '2026-08-08';
+const TARGET    = 167;
+const BASELINE  = 151;
+
+// ── STORAGE ────────────────────────────────────────────────────────────────
+function load(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;} }
+function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
+
+const S = {
+  done:     load('done',{}),       // { 'YYYY-MM-DD': {ts, note} }
+  pts:      load('pts',[]),        // [{num,date,score,lr,rc,note}]
+  misses:   load('misses',[]),     // [{ts,section,type,correct,note}]
+  addendum: load('addendum',{text:'',saved:null}),
+  checklist:load('checklist',{items:{},deadline:''}),
+};
+function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist); }
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function tod(){ return new Date().toISOString().split('T')[0]; }
+function daysUntil(ds){
+  const n=new Date(); n.setHours(0,0,0,0);
+  return Math.ceil((new Date(ds+'T00:00:00')-n)/86400000);
+}
+function fmtDate(ds){ return new Date(ds+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function tags(types){ return types.map(t=>`<span class="tag tag-${t}">${t==='condr'?'CondR':t.toUpperCase()}</span>`).join(' '); }
+function fmtTs(ts){ return new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); }
+
+function streak(){
+  const td=tod(); let s=0;
+  const d=new Date(td+'T00:00:00');
+  for(let i=0;i<200;i++){
+    const ds=d.toISOString().split('T')[0];
+    const e=byDate[ds];
+    if(!e) break;
+    if(e.types.includes('rest')){ d.setDate(d.getDate()-1); continue; }
+    if(S.done[ds]) s++;
+    else if(ds===td){ d.setDate(d.getDate()-1); continue; }
+    else break;
+    d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+function linReg(pts){
+  const n=pts.length; if(n<2) return null;
+  let sx=0,sy=0,sxy=0,sx2=0;
+  pts.forEach(([x,y])=>{sx+=x;sy+=y;sxy+=x*y;sx2+=x*x;});
+  const den=n*sx2-sx*sx; if(!den) return null;
+  const m=(n*sxy-sx*sy)/den, b=(sy-m*sx)/n;
+  return x=>m*x+b;
+}
+
+// ── PT CHART (SVG) ─────────────────────────────────────────────────────────
+function ptChart(){
+  const pts=S.pts.slice().sort((a,b)=>a.num-b.num);
+  if(!pts.length) return '';
+  const W=560,H=160,PL=36,PR=16,PT=10,PB=28;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const YMIN=140,YMAX=180;
+  const sx=n=>PL+((n-1)/5)*cW;
+  const sy=s=>PT+cH-((s-YMIN)/(YMAX-YMIN))*cH;
+  const ty=sy(TARGET);
+
+  // score dots & path
+  const dotPts=pts.map(p=>[sx(p.num),sy(p.score)]);
+  const pathD=dotPts.map(([x,y],i)=>`${i?'L':'M'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+
+  // trendline
+  let trendLine='';
+  const reg=linReg(pts.map((p,i)=>[i,p.score]));
+  if(reg&&pts.length>=2){
+    const x0=sx(pts[0].num), y0=sy(Math.max(YMIN,Math.min(YMAX,reg(0))));
+    const x1=sx(6), y1=sy(Math.max(YMIN,Math.min(YMAX,reg(5))));
+    trendLine=`<line x1="${x0}" y1="${y0.toFixed(1)}" x2="${x1}" y2="${y1.toFixed(1)}" stroke="#A78BFA" stroke-width="1.5" stroke-dasharray="4,3" opacity=".6"/>`;
+    if(reg(5)>=TARGET){
+      const proj=Math.round(Math.min(180,reg(5)));
+      trendLine+=`<text x="${x1+3}" y="${(y1-4).toFixed(1)}" fill="#A78BFA" font-size="10" font-family="'DM Mono',monospace">→${proj}</text>`;
+    }
+  }
+
+  // y labels
+  const yL=[142,151,157,163,167,172,178].map(s=>{
+    if(s<YMIN||s>YMAX) return '';
+    const y=sy(s).toFixed(1);
+    return `<text x="${PL-4}" y="${(+y+3.5).toFixed(1)}" fill="${s===TARGET?'#A78BFA':'#ccc'}" font-size="9" text-anchor="end" font-family="'DM Mono',monospace">${s}</text>`;
+  }).join('');
+
+  // x labels
+  const xL=pts.map(p=>`<text x="${sx(p.num).toFixed(1)}" y="${H-6}" fill="#bbb" font-size="9" text-anchor="middle" font-family="'DM Mono',monospace">PT${p.num}</text>`).join('');
+
+  return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" class="ptchart">
+    <line x1="${PL}" y1="${ty.toFixed(1)}" x2="${W-PR}" y2="${ty.toFixed(1)}" stroke="#A78BFA" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/>
+    <text x="${W-PR+2}" y="${(ty+3.5).toFixed(1)}" fill="#A78BFA" font-size="9" font-family="'DM Mono',monospace">167</text>
+    <line x1="${PL}" y1="${sy(BASELINE).toFixed(1)}" x2="${W-PR}" y2="${sy(BASELINE).toFixed(1)}" stroke="#ddd" stroke-width="1" stroke-dasharray="2,4" opacity=".5"/>
+    ${trendLine}
+    <path d="${pathD}" fill="none" stroke="#6D28D9" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dotPts.map(([x,y],i)=>`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#6D28D9" stroke="white" stroke-width="2"/>
+    <text x="${x.toFixed(1)}" y="${(y-9).toFixed(1)}" fill="#6D28D9" font-size="11" text-anchor="middle" font-family="'DM Mono',monospace" font-weight="500">${pts[i].score}</text>`).join('')}
+    ${yL}${xL}
+  </svg></div>`;
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const el=document.getElementById('dashboard');
+  const td=tod();
+  const entry=byDate[td];
+  const str=streak();
+  const dtt=daysUntil(TEST_DATE);
+  const lastPT=S.pts.length?S.pts.slice().sort((a,b)=>a.num-b.num).slice(-1)[0]:null;
+  const score=lastPT?lastPT.score:BASELINE;
+  const gap=TARGET-score;
+  const dl=S.checklist.deadline;
+  const dtd=dl?daysUntil(dl):null;
+  const isDone=entry&&S.done[td];
+  const isRest=entry&&entry.types.includes('rest');
+
+  let h='';
+
+  // Today card
+  if(entry){
+    if(isRest){
+      h+=`<div class="card" style="border-left:3px solid var(--gray-lt)">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">${entry.label} · Wk ${entry.week}</div>
+        <div style="font-size:15px;font-weight:500;color:var(--muted)">Rest day. Take it.</div>
+      </div>`;
+    } else {
+      const bg=isDone?'#F0FDF4':'var(--purple-lt)';
+      const br=isDone?'1px solid #86EFAC':'1px solid var(--purple-border)';
+      const tc=isDone?'#15803D':'var(--purple)';
+      h+=`<div style="background:${bg};border:${br};border-radius:12px;padding:16px;margin-bottom:10px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:${tc};text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">
+          ${isDone?'✓ Done — ':''}${entry.label} · Wk ${entry.week}
+        </div>
+        <div style="font-size:14px;font-weight:500;line-height:1.55;margin-bottom:10px;${isDone?'color:var(--muted)':''}">${esc(entry.task)}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${tags(entry.types)}</div>
+        ${!isDone?`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="td-note" placeholder="Optional note..." style="flex:1;min-width:120px;padding:7px 10px;border:1px solid var(--purple-border);border-radius:8px;background:#fff;font-size:13px;outline:none" onkeydown="if(event.key==='Enter')markTod()">
+          <button class="btn btn-primary btn-sm" onclick="markTod()">Mark done</button>
+        </div>`:`<button class="btn btn-sm btn-danger" onclick="unmarkTod()">Undo</button>`}
+      </div>`;
+    }
+  } else {
+    h+=`<div class="card"><div style="color:var(--muted);font-size:14px">No task scheduled for today.</div></div>`;
+  }
+
+  // Stats
+  h+=`<div class="stats">
+    <div class="stat">
+      <div class="stat-num" style="color:${gap<=0?'var(--green)':'var(--text)'}">${score}</div>
+      <div class="stat-label">Score</div>
+      <div class="stat-sub">${gap>0?`−${gap} to 167`:gap===0?'at target':'above!'}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">${str}</div>
+      <div class="stat-label">Streak</div>
+      <div class="stat-sub">${str===0?'start today':'days'}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" style="color:${dtt<14?'#DC2626':'var(--text)'}">${dtt}</div>
+      <div class="stat-label">Days left</div>
+      <div class="stat-sub">Aug 8</div>
+    </div>
+  </div>`;
+
+  // Countdowns
+  h+=`<div class="countdowns">
+    <div class="cdcard">
+      <div class="cdnum" style="color:${dtt<14?'#DC2626':'var(--text)'}">${dtt}</div>
+      <div class="cdlabel">Days to test</div>
+    </div>
+    <div class="cdcard">
+      <div class="cdnum">${dtd!==null?dtd:'—'}</div>
+      <div class="cdlabel">${dl?'Days to app deadline':'App deadline not set'}</div>
+    </div>
+  </div>`;
+
+  // Mini chart
+  if(S.pts.length>0){
+    h+=`<div class="card card-sm">${ptChart()}</div>`;
+  }
+
+  // Recent notes
+  const notes=Object.entries(S.done).filter(([,v])=>v.note).sort((a,b)=>b[1].ts-a[1].ts).slice(0,3);
+  if(notes.length){
+    h+=`<div class="card card-sm"><div class="sec-title">Recent Notes</div>`;
+    notes.forEach(([date,{note,ts}])=>{
+      const e=byDate[date];
+      h+=`<div class="snote"><div class="snote-date">${e?e.label:date} · ${fmtTs(ts)}</div><div class="snote-text">${esc(note)}</div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  el.innerHTML=h;
+}
+
+function markTod(){
+  const note=(document.getElementById('td-note')?.value||'').trim();
+  S.done[tod()]={ts:Date.now(),note};
+  persist(); renderDashboard(); renderSessions();
+}
+function unmarkTod(){
+  delete S.done[tod()]; persist(); renderDashboard(); renderSessions();
+}
+
+// ── SESSIONS ───────────────────────────────────────────────────────────────
+function renderSessions(){
+  const el=document.getElementById('sessions');
+  const td=tod();
+  const openWk=byDate[td]?.week||1;
+
+  // Group by week
+  const wkMap={};
+  plan.forEach(d=>{ (wkMap[d.week]=wkMap[d.week]||[]).push(d); });
+
+  let h=`<div class="sec-title" style="margin-bottom:10px">14-Week Study Plan</div>`;
+
+  Object.keys(wkMap).sort((a,b)=>a-b).forEach(wk=>{
+    const days=wkMap[wk]; const wn=+wk;
+    const active=days.filter(d=>!d.types.includes('rest'));
+    const done=active.filter(d=>S.done[d.date]).length;
+    const isOpen=wn===openWk;
+
+    h+=`<div class="week-card">
+      <div class="week-hdr" onclick="toggleWk(${wn})">
+        <span class="wk-num">WK ${String(wn).padStart(2,'0')}</span>
+        <span class="wk-title">${WEEK_LABELS[wn]}</span>
+        <span class="wk-dates">${done}/${active.length} · ${WEEK_DATES[wn]}</span>
+        <span class="chevron" id="ch${wn}" style="${isOpen?'transform:rotate(180deg)':''}">&#9660;</span>
+      </div>
+      <div class="week-body${isOpen?' open':''}" id="wb${wn}">`;
+
+    days.forEach(d=>{
+      const isToday=d.date===td;
+      const isDone=!!S.done[d.date];
+      const isRest=d.types.includes('rest');
+      const note=S.done[d.date]?.note||'';
+      h+=`<div class="day-row${isToday?' is-today':''}${isRest?' is-rest':''}">
+        <div class="day-dname">${d.label}</div>
+        <div>
+          <div class="day-task">${esc(d.task)}</div>
+          <div class="day-tags">${tags(d.types)}</div>
+          ${isDone&&note?`<div class="day-note-text">"${esc(note)}"</div>`:''}
+          ${isDone?`<div style="display:flex;gap:5px;align-items:center;margin-top:6px">
+            <span style="font-size:11px;color:#15803D;font-family:'DM Mono',monospace">✓ done</span>
+            <button class="btn btn-sm btn-danger" style="padding:2px 7px;font-size:10px" onclick="unmarkDay('${d.date}')">undo</button>
+            <button class="btn btn-sm btn-secondary" style="padding:2px 7px;font-size:10px" onclick="editNote('${d.date}')">edit note</button>
+          </div>`:(!isRest?`<div class="note-row" id="nr-${d.date}">
+            <input type="text" id="n-${d.date}" placeholder="Note..." onkeydown="if(event.key==='Enter')markDay('${d.date}')">
+            <button class="btn btn-primary btn-sm" onclick="markDay('${d.date}')">Done</button>
+          </div>`:'')}
+        </div>
+        ${!isRest?`<button class="check-btn${isDone?' done':''}" onclick="${isDone?`unmarkDay('${d.date}')`:`markDay('${d.date}')`}">${isDone?'✓':''}</button>`:'<div></div>'}
+      </div>`;
+    });
+    h+=`</div></div>`;
+  });
+
+  // Notes feed
+  const feed=Object.entries(S.done).filter(([,v])=>v.note).sort((a,b)=>b[1].ts-a[1].ts);
+  if(feed.length){
+    h+=`<div class="sec-title" style="margin-top:20px;margin-bottom:8px">Session Notes</div><div class="card card-sm">`;
+    feed.forEach(([date,{note,ts}])=>{
+      const e=byDate[date];
+      h+=`<div class="snote"><div class="snote-date">${e?e.label:date} · ${fmtTs(ts)}</div><div class="snote-text">${esc(note)}</div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  el.innerHTML=h;
+}
+
+function toggleWk(wk){
+  const b=document.getElementById(`wb${wk}`), c=document.getElementById(`ch${wk}`);
+  const open=b.classList.toggle('open');
+  if(c) c.style.transform=open?'rotate(180deg)':'';
+}
+function markDay(date){
+  const note=(document.getElementById(`n-${date}`)?.value||'').trim();
+  S.done[date]={ts:Date.now(),note}; persist();
+  renderSessions(); if(date===tod()) renderDashboard();
+}
+function unmarkDay(date){
+  delete S.done[date]; persist();
+  renderSessions(); if(date===tod()) renderDashboard();
+}
+function editNote(date){
+  const cur=S.done[date]?.note||'';
+  const n=prompt('Edit note:',cur);
+  if(n===null) return;
+  S.done[date]={...(S.done[date]||{}),note:n,ts:Date.now()}; persist();
+  renderSessions(); renderDashboard();
+}
+
+// ── PT TRACKER ─────────────────────────────────────────────────────────────
+function renderPT(){
+  const el=document.getElementById('pt');
+  const pts=S.pts.slice().sort((a,b)=>a.num-b.num);
+  let h='';
+
+  // Plateau warning
+  if(pts.length>=3){
+    const l3=pts.slice(-3).map(p=>p.score);
+    if(Math.max(...l3)-Math.min(...l3)<=2){
+      h+=`<div style="background:var(--amber-lt);border:1px solid #FCD34D;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:var(--amber)">
+        <strong style="font-family:'DM Mono',monospace;font-size:10px">⚠ PLATEAU</strong> — Last 3 PTs within 2 points. Bring your miss breakdowns to Claude for targeted drilling.
+      </div>`;
+    }
+  }
+
+  // Chart
+  if(pts.length>0){
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Score Progression</div>${ptChart()}</div>`;
+
+    // Projection
+    const reg=linReg(pts.map((p,i)=>[i,p.score]));
+    if(reg&&pts.length>=2){
+      const proj=Math.round(Math.min(180,Math.max(120,reg(5))));
+      const onTrack=proj>=TARGET;
+      h+=`<div class="card card-sm" style="margin-bottom:10px">
+        <div class="sec-title">Trendline Projection</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:${onTrack?'var(--green)':'var(--text)'}">${proj}</div>
+          <div>
+            <div style="font-size:13px;font-weight:500;color:${onTrack?'var(--green)':'#DC2626'}">${onTrack?'On track for 167+':proj>=TARGET-4?`${TARGET-proj} below target — close`:`${TARGET-proj} below target`}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Projected score at PT 6 · based on ${pts.length} PT${pts.length>1?'s':''}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+
+  // Log form
+  const logged=new Set(pts.map(p=>p.num));
+  h+=`<div class="card">
+    <div class="sec-title">Log Practice Test</div>
+    <div class="form2">
+      <div class="fg"><label>PT #</label>
+        <select id="pt-num">${[1,2,3,4,5,6].map(n=>`<option value="${n}"${logged.has(n)?' disabled':''}>PT ${n}${logged.has(n)?' (logged)':''}</option>`).join('')}</select>
+      </div>
+      <div class="fg"><label>Date taken</label><input type="date" id="pt-date" value="${tod()}"></div>
+    </div>
+    <div class="form2">
+      <div class="fg"><label>Overall score</label><input type="number" id="pt-score" min="120" max="180" placeholder="e.g. 158"></div>
+      <div class="fg"><label>LR misses</label><input type="number" id="pt-lr" min="0" max="52" placeholder="e.g. 8"></div>
+    </div>
+    <div class="form2">
+      <div class="fg"><label>RC misses</label><input type="number" id="pt-rc" min="0" max="27" placeholder="e.g. 5"></div>
+      <div class="fg"><label>Note</label><input type="text" id="pt-note" placeholder="Optional..."></div>
+    </div>
+    <button class="btn btn-primary" onclick="logPT()">Log PT Score</button>
+  </div>`;
+
+  // Table
+  if(pts.length){
+    h+=`<div class="card card-sm" style="margin-top:10px"><div class="sec-title">Logged Scores</div>`;
+    pts.forEach(p=>{
+      const gap=TARGET-p.score;
+      h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F5F4F0">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:32px">PT ${p.num}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:${p.score>=TARGET?'var(--green)':'var(--text)'}">${p.score}</span>
+        <span style="font-size:11px;color:var(--muted)">LR: ${p.lr??'—'} RC: ${p.rc??'—'}</span>
+        <span style="flex:1;font-size:11px;color:var(--faint)">${esc(p.note||'')}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:${gap<=0?'var(--green)':'var(--faint)'};">${gap<=0?'+'+Math.abs(gap):'-'+gap}</span>
+        <span style="font-size:10px;color:var(--faint)">${p.date}</span>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 2px;line-height:1" onclick="delPT(${p.num})">×</button>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  el.innerHTML=h;
+}
+
+function logPT(){
+  const num=+document.getElementById('pt-num').value;
+  const date=document.getElementById('pt-date').value;
+  const score=+document.getElementById('pt-score').value;
+  const lr=document.getElementById('pt-lr').value;
+  const rc=document.getElementById('pt-rc').value;
+  const note=(document.getElementById('pt-note').value||'').trim();
+  if(!score||score<120||score>180){alert('Enter a valid score (120–180)');return;}
+  S.pts=S.pts.filter(p=>p.num!==num);
+  S.pts.push({num,date,score,lr:lr?+lr:null,rc:rc?+rc:null,note});
+  S.pts.sort((a,b)=>a.num-b.num);
+  persist(); renderPT(); renderDashboard();
+}
+function delPT(num){
+  if(!confirm(`Delete PT ${num}?`)) return;
+  S.pts=S.pts.filter(p=>p.num!==num); persist(); renderPT(); renderDashboard();
+}
+
+// ── MISS TRACKER ───────────────────────────────────────────────────────────
+const QTYPES = [
+  {id:'condr',   label:'CondR',              s:'LR'},
+  {id:'causr',   label:'CausR / Strengthen', s:'LR'},
+  {id:'flaw',    label:'Flaw',               s:'LR'},
+  {id:'assumption',label:'Assumption (NA)',  s:'LR'},
+  {id:'weaken',  label:'Weaken',             s:'LR'},
+  {id:'mbt',     label:'Must Be True',       s:'LR'},
+  {id:'inference',label:'Inference / MSS',   s:'LR'},
+  {id:'method',  label:'Method of Reasoning',s:'LR'},
+  {id:'principle',label:'Principle',         s:'LR'},
+  {id:'parallel',label:'Parallel Reasoning', s:'LR'},
+  {id:'resolve', label:'Resolve / Explain',  s:'LR'},
+  {id:'rc-mbt',  label:'RC: Must Be True',   s:'RC'},
+  {id:'rc-mp',   label:'RC: Main Point',     s:'RC'},
+  {id:'rc-inf',  label:'RC: Inference',      s:'RC'},
+  {id:'rc-att',  label:'RC: Author Attitude',s:'RC'},
+  {id:'rc-sw',   label:'RC: Strengthen/Weaken',s:'RC'},
+  {id:'rc-vocab',label:'RC: Vocab in Context',s:'RC'},
+  {id:'rc-comp', label:'RC: Comparative',    s:'RC'},
+];
+function qtLabel(id){ return QTYPES.find(q=>q.id===id)?.label||id; }
+
+function renderMisses(){
+  const el=document.getElementById('misses');
+  const log=S.misses;
+
+  // Aggregate
+  const agg={};
+  log.forEach(m=>{
+    if(!agg[m.type]) agg[m.type]={tot:0,miss:0};
+    agg[m.type].tot++;
+    if(!m.correct) agg[m.type].miss++;
+  });
+  const byMiss=Object.entries(agg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
+  const maxM=Math.max(1,...byMiss.map(([,v])=>v.miss));
+  const top3=byMiss.filter(([,v])=>v.miss>0).slice(0,3);
+
+  let h='';
+
+  if(top3.length){
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Areas</div>`;
+    top3.forEach(([id,v],i)=>{
+      const pct=Math.round((v.miss/v.tot)*100);
+      h+=`<div class="weak-row">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
+        <span class="weak-name">${qtLabel(id)}</span>
+        <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
+        <span class="weak-ct">${v.miss} miss</span>
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  if(byMiss.length>3){
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Tracked</div>`;
+    byMiss.forEach(([id,v])=>{
+      const qt=QTYPES.find(q=>q.id===id);
+      const pct=Math.round((v.miss/v.tot)*100);
+      h+=`<div class="weak-row">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
+        <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
+        <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
+        <span class="weak-ct">${v.miss}/${v.tot}</span>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`<div class="card">
+    <div class="sec-title">Log Question</div>
+    <div class="form2">
+      <div class="fg"><label>Section</label>
+        <select id="m-section" onchange="refreshMissTypes()">
+          <option value="LR">LR</option><option value="RC">RC</option>
+        </select>
+      </div>
+      <div class="fg"><label>Result</label>
+        <select id="m-correct">
+          <option value="0">Missed ✗</option>
+          <option value="1">Correct ✓</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label>Question Type</label><select id="m-type"></select></div>
+    <div class="fg"><label>Note (why missed / pattern)</label>
+      <input type="text" id="m-note" placeholder="e.g. Confused necessary vs sufficient on chain ending">
+    </div>
+    <button class="btn btn-primary" onclick="logMiss()">Log</button>
+  </div>`;
+
+  if(log.length){
+    const recent=log.slice().reverse().slice(0,25);
+    h+=`<div class="card card-sm" style="margin-top:10px"><div class="sec-title">Recent Log</div>`;
+    recent.forEach((m,i)=>{
+      const orig=log.length-1-i;
+      const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
+      const tc=m.correct?'var(--green)':'var(--red)';
+      h+=`<div class="miss-item">
+        <span class="miss-badge" style="background:${bg};color:${tc}">${m.correct?'✓':'✗'} ${qtLabel(m.type)}</span>
+        <div style="flex:1">
+          ${m.note?`<div style="font-size:12px;margin-bottom:2px">${esc(m.note)}</div>`:''}
+          <div class="miss-meta">${m.section} · ${new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+        </div>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delMiss(${orig})">×</button>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  el.innerHTML=h;
+  refreshMissTypes();
+}
+
+function refreshMissTypes(){
+  const s=document.getElementById('m-section')?.value;
+  const sel=document.getElementById('m-type');
+  if(!sel) return;
+  sel.innerHTML=QTYPES.filter(q=>q.s===s).map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
+}
+function logMiss(){
+  const section=document.getElementById('m-section').value;
+  const type=document.getElementById('m-type').value;
+  const correct=document.getElementById('m-correct').value==='1';
+  const note=(document.getElementById('m-note').value||'').trim();
+  S.misses.push({ts:Date.now(),section,type,correct,note});
+  document.getElementById('m-note').value='';
+  persist(); renderMisses();
+}
+function delMiss(idx){
+  S.misses.splice(idx,1); persist(); renderMisses();
+}
+
+// ── ADDENDUM ───────────────────────────────────────────────────────────────
+let adTimer=null;
+
+function renderAddendum(){
+  const el=document.getElementById('addendum');
+  const {text,saved}=S.addendum;
+  const wc=text.trim().split(/\s+/).filter(Boolean).length;
+  const wcHint=wc===0?'':wc<150?' — keep writing':wc<300?' — good length':' — trim if needed';
+
+  el.innerHTML=`
+    <div class="sec-title" style="margin-bottom:10px">GPA Addendum</div>
+    <div class="card" style="padding:12px;margin-bottom:8px">
+      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px">
+        Context: 3.0 undergrad (UT Austin) → 3.78 MS Georgetown → 10+ yrs Senior SEO Manager.<br>
+        Fordham PT Evening median: 165 / 3.60. Lean on upward trajectory + work experience.
+      </div>
+      <textarea class="addendum-area" id="ad-text" placeholder="Write your GPA addendum here..." oninput="adChanged()">${esc(text)}</textarea>
+      <div class="addendum-meta">
+        <span id="ad-wc">${wc} words${wcHint}</span>
+        <span id="ad-saved">${saved?'Saved '+new Date(saved).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'Not saved yet'}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="saveAd()">Save</button>
+      <button class="btn btn-secondary btn-sm" onclick="copyAd()">Copy text</button>
+    </div>`;
+}
+
+function adChanged(){
+  clearTimeout(adTimer);
+  adTimer=setTimeout(saveAd,2500);
+  const text=document.getElementById('ad-text')?.value||'';
+  const wc=text.trim().split(/\s+/).filter(Boolean).length;
+  const wcHint=wc===0?'':wc<150?' — keep writing':wc<300?' — good length':' — trim if needed';
+  const wcEl=document.getElementById('ad-wc');
+  if(wcEl) wcEl.textContent=`${wc} words${wcHint}`;
+}
+function saveAd(){
+  const ta=document.getElementById('ad-text');
+  if(!ta) return;
+  S.addendum={text:ta.value,saved:Date.now()};
+  persist();
+  const el=document.getElementById('ad-saved');
+  if(el) el.textContent='Saved '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+function copyAd(){
+  const ta=document.getElementById('ad-text');
+  if(!ta) return;
+  if(navigator.clipboard){ navigator.clipboard.writeText(ta.value); }
+  else { ta.select(); document.execCommand('copy'); }
+}
+
+// ── CHECKLIST ──────────────────────────────────────────────────────────────
+const CL_ITEMS=[
+  {id:'lsat',        label:'Official LSAT score (Aug 8 result)'},
+  {id:'ps',          label:'Personal statement — drafted & reviewed'},
+  {id:'addendum',    label:'GPA addendum — finalized'},
+  {id:'lor1',        label:'Letter of recommendation #1'},
+  {id:'lor2',        label:'Letter of recommendation #2'},
+  {id:'resume',      label:'Resume / CV updated'},
+  {id:'transcripts', label:'Official transcripts ordered'},
+  {id:'fordham-app', label:'Fordham application form completed'},
+  {id:'app-fee',     label:'Application fee paid'},
+];
+
+function renderChecklist(){
+  const el=document.getElementById('checklist');
+  const {items,deadline}=S.checklist;
+  const done=CL_ITEMS.filter(i=>items[i.id]).length;
+  const dtd=deadline?daysUntil(deadline):null;
+
+  let h=`<div class="card card-sm" style="margin-bottom:10px">
+    <div class="sec-title">Application Deadline</div>
+    <div class="fg" style="margin-bottom:8px">
+      <label>Target Submission Date</label>
+      <input type="date" id="cl-dl" value="${deadline||''}" onchange="setDL(this.value)">
+    </div>
+    ${deadline?`<div style="display:flex;align-items:center;gap:12px;margin-top:2px">
+      <div style="font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:${dtd<30?'#DC2626':'var(--text)'}">${dtd}</div>
+      <div style="font-size:12px;color:var(--muted)">days until<br>${fmtDate(deadline)}</div>
+    </div>`:`<div style="font-size:13px;color:var(--faint)">Set a date to track countdown on dashboard.</div>`}
+  </div>
+
+  <div class="card">
+    <div class="sec-title">${done}/${CL_ITEMS.length} Complete — Fordham PT Evening</div>`;
+
+  CL_ITEMS.forEach(item=>{
+    const checked=!!items[item.id];
+    h+=`<div class="cl-item">
+      <input type="checkbox" class="cl-check" id="cl-${item.id}" ${checked?'checked':''} onchange="toggleCL('${item.id}',this.checked)">
+      <label for="cl-${item.id}" class="cl-label${checked?' done':''}">${item.label}</label>
+    </div>`;
+  });
+
+  h+=`</div>`;
+  el.innerHTML=h;
+}
+
+function setDL(val){
+  S.checklist.deadline=val; persist(); renderChecklist(); renderDashboard();
+}
+function toggleCL(id,checked){
+  S.checklist.items[id]=checked; persist();
+  const lbl=document.querySelector(`label[for="cl-${id}"]`);
+  if(lbl) lbl.classList.toggle('done',checked);
+  const done=CL_ITEMS.filter(i=>S.checklist.items[i.id]).length;
+  const h2=document.querySelector('#checklist .sec-title:last-of-type');
+  // update count in the card title
+  document.querySelectorAll('#checklist .sec-title').forEach(el=>{
+    if(el.textContent.includes('Complete')) el.textContent=`${done}/${CL_ITEMS.length} Complete — Fordham PT Evening`;
+  });
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('nav button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const cur=document.querySelector('nav button.active')?.dataset.tab;
+    if(cur==='addendum') saveAd();
+
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    const tab=btn.dataset.tab;
+    document.getElementById(tab).classList.add('active');
+
+    if(tab==='sessions')  renderSessions();
+    if(tab==='pt')        renderPT();
+    if(tab==='misses')    renderMisses();
+    if(tab==='addendum')  renderAddendum();
+    if(tab==='checklist') renderChecklist();
+  });
+});
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+renderDashboard();
+</script>
+</body>
+</html>
