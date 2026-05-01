@@ -5,11 +5,9 @@ A personal study tracker built for my 14-week LSAT prep leading up to the August
 ## Features
 
 - **Dashboard** — today's task pulled automatically from the study plan, score trajectory, day streak, and countdown to test day
-- **Session logger** — mark each day complete, add notes, searchable reverse-chronological feed
+- **Session logger** — mark each day complete, add notes, reverse-chronological feed
 - **PT score tracker** — log all 6 practice tests with LR/RC miss breakdowns, score progression chart, trendline projection toward target, plateau detection
 - **Miss pattern tracker** — log individual questions by type, surfaces top 3 weak areas automatically
-- **GPA addendum workspace** — autosaving rich text editor with word count
-- **Application checklist** — deadline countdown, component tracking for Fordham Law
 
 ## Stack
 

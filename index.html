@@ -140,8 +140,6 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
   <button data-tab="sessions">Sessions</button>
   <button data-tab="pt">PT Scores</button>
   <button data-tab="misses">Misses</button>
-  <button data-tab="addendum">Addendum</button>
-  <button data-tab="checklist">Checklist</button>
   <span style="display:flex;align-items:center;margin-left:auto;padding-right:12px;flex-shrink:0">
     <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;cursor:default" title="Connecting..."></span>
   </span>
@@ -152,8 +150,6 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
   <div id="sessions"  class="section"></div>
   <div id="pt"        class="section"></div>
   <div id="misses"    class="section"></div>
-  <div id="addendum"  class="section"></div>
-  <div id="checklist" class="section"></div>
 </main>
 
 <script>
@@ -299,10 +295,8 @@ const S = {
   done:     load('done',{}),       // { 'YYYY-MM-DD': {ts, note} }
   pts:      load('pts',[]),        // [{num,date,score,lr,rc,note}]
   misses:   load('misses',[]),     // [{ts,section,type,correct,note}]
-  addendum: load('addendum',{text:'',saved:null}),
-  checklist:load('checklist',{items:{},deadline:''}),
 };
-function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist); syncRemote(); }
+function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses); syncRemote(); }
 
 function setSyncDot(state){
   const d=document.getElementById('sync-dot'); if(!d) return;
@@ -334,9 +328,7 @@ async function loadRemote(){
       if(d.done)      S.done=d.done;
       if(d.pts)       S.pts=d.pts;
       if(d.misses)    S.misses=d.misses;
-      if(d.addendum)  S.addendum=d.addendum;
-      if(d.checklist) S.checklist=d.checklist;
-      save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('addendum',S.addendum);save('checklist',S.checklist);
+      save('done',S.done);save('pts',S.pts);save('misses',S.misses);
     }
     setSyncDot('ok');
   }catch{ setSyncDot('err'); }
@@ -852,125 +844,10 @@ function delMiss(idx){
   S.misses.splice(idx,1); persist(); renderMisses();
 }
 
-// ── ADDENDUM ───────────────────────────────────────────────────────────────
-let adTimer=null;
-
-function renderAddendum(){
-  const el=document.getElementById('addendum');
-  const {text,saved}=S.addendum;
-  const wc=text.trim().split(/\s+/).filter(Boolean).length;
-  const wcHint=wc===0?'':wc<150?' — keep writing':wc<300?' — good length':' — trim if needed';
-
-  el.innerHTML=`
-    <div class="sec-title" style="margin-bottom:10px">GPA Addendum</div>
-    <div class="card" style="padding:12px;margin-bottom:8px">
-      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px">
-        Context: 3.0 undergrad (UT Austin) → 3.78 MS Georgetown → 10+ yrs Senior SEO Manager.<br>
-        Fordham PT Evening median: 165 / 3.60. Lean on upward trajectory + work experience.
-      </div>
-      <textarea class="addendum-area" id="ad-text" placeholder="Write your GPA addendum here..." oninput="adChanged()">${esc(text)}</textarea>
-      <div class="addendum-meta">
-        <span id="ad-wc">${wc} words${wcHint}</span>
-        <span id="ad-saved">${saved?'Saved '+new Date(saved).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'Not saved yet'}</span>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-primary" onclick="saveAd()">Save</button>
-      <button class="btn btn-secondary btn-sm" onclick="copyAd()">Copy text</button>
-    </div>`;
-}
-
-function adChanged(){
-  clearTimeout(adTimer);
-  adTimer=setTimeout(saveAd,2500);
-  const text=document.getElementById('ad-text')?.value||'';
-  const wc=text.trim().split(/\s+/).filter(Boolean).length;
-  const wcHint=wc===0?'':wc<150?' — keep writing':wc<300?' — good length':' — trim if needed';
-  const wcEl=document.getElementById('ad-wc');
-  if(wcEl) wcEl.textContent=`${wc} words${wcHint}`;
-}
-function saveAd(){
-  const ta=document.getElementById('ad-text');
-  if(!ta) return;
-  S.addendum={text:ta.value,saved:Date.now()};
-  persist();
-  const el=document.getElementById('ad-saved');
-  if(el) el.textContent='Saved '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-}
-function copyAd(){
-  const ta=document.getElementById('ad-text');
-  if(!ta) return;
-  if(navigator.clipboard){ navigator.clipboard.writeText(ta.value); }
-  else { ta.select(); document.execCommand('copy'); }
-}
-
-// ── CHECKLIST ──────────────────────────────────────────────────────────────
-const CL_ITEMS=[
-  {id:'lsat',        label:'Official LSAT score (Aug 8 result)'},
-  {id:'ps',          label:'Personal statement — drafted & reviewed'},
-  {id:'addendum',    label:'GPA addendum — finalized'},
-  {id:'lor1',        label:'Letter of recommendation #1'},
-  {id:'lor2',        label:'Letter of recommendation #2'},
-  {id:'resume',      label:'Resume / CV updated'},
-  {id:'transcripts', label:'Official transcripts ordered'},
-  {id:'fordham-app', label:'Fordham application form completed'},
-  {id:'app-fee',     label:'Application fee paid'},
-];
-
-function renderChecklist(){
-  const el=document.getElementById('checklist');
-  const {items,deadline}=S.checklist;
-  const done=CL_ITEMS.filter(i=>items[i.id]).length;
-  const dtd=deadline?daysUntil(deadline):null;
-
-  let h=`<div class="card card-sm" style="margin-bottom:10px">
-    <div class="sec-title">Application Deadline</div>
-    <div class="fg" style="margin-bottom:8px">
-      <label>Target Submission Date</label>
-      <input type="date" id="cl-dl" value="${deadline||''}" onchange="setDL(this.value)">
-    </div>
-    ${deadline?`<div style="display:flex;align-items:center;gap:12px;margin-top:2px">
-      <div style="font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:${dtd<30?'#DC2626':'var(--text)'}">${dtd}</div>
-      <div style="font-size:12px;color:var(--muted)">days until<br>${fmtDate(deadline)}</div>
-    </div>`:`<div style="font-size:13px;color:var(--faint)">Set a date to track countdown on dashboard.</div>`}
-  </div>
-
-  <div class="card">
-    <div class="sec-title">${done}/${CL_ITEMS.length} Complete — Fordham PT Evening</div>`;
-
-  CL_ITEMS.forEach(item=>{
-    const checked=!!items[item.id];
-    h+=`<div class="cl-item">
-      <input type="checkbox" class="cl-check" id="cl-${item.id}" ${checked?'checked':''} onchange="toggleCL('${item.id}',this.checked)">
-      <label for="cl-${item.id}" class="cl-label${checked?' done':''}">${item.label}</label>
-    </div>`;
-  });
-
-  h+=`</div>`;
-  el.innerHTML=h;
-}
-
-function setDL(val){
-  S.checklist.deadline=val; persist(); renderChecklist(); renderDashboard();
-}
-function toggleCL(id,checked){
-  S.checklist.items[id]=checked; persist();
-  const lbl=document.querySelector(`label[for="cl-${id}"]`);
-  if(lbl) lbl.classList.toggle('done',checked);
-  const done=CL_ITEMS.filter(i=>S.checklist.items[i.id]).length;
-  const h2=document.querySelector('#checklist .sec-title:last-of-type');
-  // update count in the card title
-  document.querySelectorAll('#checklist .sec-title').forEach(el=>{
-    if(el.textContent.includes('Complete')) el.textContent=`${done}/${CL_ITEMS.length} Complete — Fordham PT Evening`;
-  });
-}
 
 // ── NAV ────────────────────────────────────────────────────────────────────
 document.querySelectorAll('nav button').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    const cur=document.querySelector('nav button.active')?.dataset.tab;
-    if(cur==='addendum') saveAd();
-
     document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     btn.classList.add('active');
@@ -980,8 +857,6 @@ document.querySelectorAll('nav button').forEach(btn=>{
     if(tab==='sessions')  renderSessions();
     if(tab==='pt')        renderPT();
     if(tab==='misses')    renderMisses();
-    if(tab==='addendum')  renderAddendum();
-    if(tab==='checklist') renderChecklist();
   });
 });
 
