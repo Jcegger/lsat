@@ -158,10 +158,10 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 const PLAN_RAW = [
 ['2026-05-01','Fri May 1','Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35).',['book'],1],
 ['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61).',['book'],1],
-['2026-05-03','Sun May 3','Diagnostic PT — full timed, cold baseline. Home, ethernet, phone off. This is data, not a grade.',['pt'],1],
-['2026-05-04','Mon May 4','Ch 3 second half — Passage Argumentation, Main Point, Passage Structure, Sample Passage Analyzed (pp.79–114). Do the Basic Summary and Purpose Drill (p.93).',['book'],1],
-['2026-05-05','Tue May 5','Ch 4: Passage Elements & Formations — recognition drill (p.141). Then 20 untimed CondR on 7Sage — multi-link chains only. Bring misses to Claude.',['book','condr'],1],
-['2026-05-06','Wed May 6','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Then 20 untimed mixed LR — let 7Sage analytics surface what\'s slipping. Bring misses to Claude.',['book','lr'],1],
+['2026-05-03','Sun May 3','Ch 3 second half — Passage Argumentation, Main Point, Passage Structure, Sample Passage Analyzed (pp.79–114). Do the Basic Summary and Purpose Drill (p.93).',['book'],1],
+['2026-05-04','Mon May 4','Ch 4: Passage Elements & Formations — recognition drill (p.141). Then 20 untimed CondR on 7Sage — multi-link chains only. Bring misses to Claude.',['book','condr'],1],
+['2026-05-05','Tue May 5','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach.',['book'],1],
+['2026-05-06','Wed May 6','20 untimed mixed LR (all types). Let 7Sage analytics surface what\'s slipping. Bring misses to Claude.',['lr'],1],
 ['2026-05-07','Thu May 7','Rest.',['rest'],1],
 ['2026-05-08','Fri May 8','Ch 6 pt 1 (pp.179–200): question stems, location element, types overview. Do Location Designation Drill (p.183).',['book'],2],
 ['2026-05-09','Sat May 9','Ch 6 pt 2 (pp.201–246): Must Be True, Strengthen, Weaken, all subtypes. Do Identify the Question Stem Drill (p.191).',['book'],2],
@@ -259,7 +259,7 @@ const PLAN_RAW = [
 ];
 
 const WEEK_LABELS = {
-  1:'Chs 1–5 + Diagnostic PT (May 3)',2:'Ch 6: questions + drilling',
+  1:'Chs 1–5: how to read + LR begins',2:'Ch 6: questions + drilling',
   3:'Chs 8–9: comparative + passage themes',4:'Ch 10 + Vegas trip (May 22–25)',
   5:'PT #1 (May 31) + review',6:'PT #1 drilling + stamina',
   7:'PT #2 (Jun 14) + review',8:'RC ReChallenge + section stamina',
@@ -373,7 +373,7 @@ function wkRange(days){
   return fm===lm?`${fl}–${ll.split(' ')[1]}`:`${fl}–${ll}`;
 }
 const CAL_WK_LABEL={
-  '2026-04-27':'PowerScore Chs 1–3 + Diagnostic PT',
+  '2026-04-27':'PowerScore Chs 1–3: RC fundamentals',
   '2026-05-04':'Chs 4–6: passage elements + question types + CondR',
   '2026-05-11':'Chs 7–9: full passages + comparative',
   '2026-05-18':'CondR/LR + Vegas trip (May 21–25)',
