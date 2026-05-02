@@ -157,9 +157,9 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 // [date, label, task, types[], week]
 const PLAN_RAW = [
 ['2026-05-01','Fri May 1','Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35).',['book'],1],
-['2026-05-02','Sat May 2','Ch 3: VIEWSTAMP. Most important chapter. Take notes, do all drills.',['book'],1],
-['2026-05-03','Sun May 3','Finish Ch 3 if needed. Ch 4: Passage Elements & Formations. Do recognition drill (p.141).',['book'],1],
-['2026-05-04','Mon May 4','20 untimed CondR questions on 7Sage — multi-link chains only. Bring misses to Claude.',['condr'],1],
+['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61).',['book'],1],
+['2026-05-03','Sun May 3','Ch 3 second half — Passage Argumentation, Main Point, Passage Structure, Sample Passage Analyzed (pp.79–114). Do the Basic Summary and Purpose Drill (p.93).',['book'],1],
+['2026-05-04','Mon May 4','Ch 4: Passage Elements & Formations — recognition drill (p.141). Then 20 untimed CondR on 7Sage — multi-link chains only. Bring misses to Claude.',['book','condr'],1],
 ['2026-05-05','Tue May 5','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach.',['book'],1],
 ['2026-05-06','Wed May 6','20 untimed mixed LR (all types). Let 7Sage analytics surface what\'s slipping. Bring misses to Claude.',['lr'],1],
 ['2026-05-07','Thu May 7','Rest.',['rest'],1],
@@ -176,20 +176,20 @@ const PLAN_RAW = [
 ['2026-05-18','Mon May 18','20 untimed CondR — CausR traps (correlation, reverse causation, alternative cause, confounding variable). Bring misses to Claude.',['condr'],3],
 ['2026-05-19','Tue May 19','3 untimed 7Sage RC passages — mix of all passage types. Passage map required for each.',['rc'],3],
 ['2026-05-20','Wed May 20','20 untimed mixed LR. Identify if same question types keep slipping. Bring pattern to Claude.',['lr'],3],
-['2026-05-21','Thu May 21','Rest.',['rest'],3],
-['2026-05-22','Fri May 22','Ch 10: Section Strategy & Management (pp.401–431). Study "Plus 2" Timing Formula and pacing guidelines carefully.',['book'],4],
-['2026-05-23','Sat May 23','20 untimed CondR — last targeted session before PT #1. How are the chains feeling?',['condr'],4],
-['2026-05-24','Sun May 24','Practice Test #1 — full timed PT. Home, ethernet, phone off. First real benchmark.',['pt'],4],
-['2026-05-25','Mon May 25','PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude.',['review'],4],
-['2026-05-26','Tue May 26','Targeted drilling on PT #1 weak areas. Claude will direct.',['review'],4],
+['2026-05-21','Thu May 21','Rest — travel day to Vegas.',['rest'],3],
+['2026-05-22','Fri May 22','Ch 10: Section Strategy & Management (pp.401–431). Good plane/hotel read. Study "Plus 2" Timing Formula and pacing guidelines. Then 15 min light CondR review — chains and contrapositive rules on paper, no 7Sage needed.',['book','condr'],4],
+['2026-05-23','Sat May 23','Rest — Vegas.',['rest'],4],
+['2026-05-24','Sun May 24','Rest — Vegas.',['rest'],4],
+['2026-05-25','Mon May 25','Rest — Vegas / travel home.',['rest'],4],
+['2026-05-26','Tue May 26','20 untimed CondR — last targeted session before PT #1. How are the chains feeling?',['condr'],4],
 ['2026-05-27','Wed May 27','20 untimed mixed LR.',['lr'],4],
 ['2026-05-28','Thu May 28','Rest.',['rest'],4],
-['2026-05-29','Fri May 29','Timed RC section (35 min). Keep passage mapping — just do it faster.',['rc'],5],
-['2026-05-30','Sat May 30','Review timed RC. Where did time go? Which passage hurt most? Bring to Claude.',['review'],5],
-['2026-05-31','Sun May 31','Timed RC section. Target ~8 min per passage.',['rc'],5],
-['2026-06-01','Mon Jun 1','Timed LR section (35 min). Note which question types slow you down.',['lr'],5],
-['2026-06-02','Tue Jun 2','25 untimed CondR — are the chains clicking under untimed conditions? Bring misses to Claude.',['condr'],5],
-['2026-06-03','Wed Jun 3','Review both timed sections from weekend. Categorize all misses. Bring to Claude.',['review'],5],
+['2026-05-29','Fri May 29','2 untimed 7Sage RC passages. Focus on weakest passage type from Week 3. Passage map required for each.',['rc'],5],
+['2026-05-30','Sat May 30','Review RC misses from Friday. Bring to Claude.',['review'],5],
+['2026-05-31','Sun May 31','Practice Test #1 — full timed PT. Home, ethernet, phone off. First real benchmark.',['pt'],5],
+['2026-06-01','Mon Jun 1','PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude.',['review'],5],
+['2026-06-02','Tue Jun 2','Targeted drilling on PT #1 weak areas. Claude will direct.',['review'],5],
+['2026-06-03','Wed Jun 3','20 untimed mixed LR.',['lr'],5],
 ['2026-06-04','Thu Jun 4','Rest.',['rest'],5],
 ['2026-06-05','Fri Jun 5','Timed RC section. Try to finish with 2 min to spare — skip and return if stuck.',['rc'],6],
 ['2026-06-06','Sat Jun 6','25 untimed mixed LR. Target 90%+ accuracy. Bring misses to Claude.',['lr'],6],
@@ -260,8 +260,8 @@ const PLAN_RAW = [
 
 const WEEK_LABELS = {
   1:'Chs 1–5: how to read + LR begins',2:'Ch 6: questions + drilling',
-  3:'Chs 8–9: comparative + passage themes',4:'Ch 10 + PT #1',
-  5:'First timed RC + timed LR',6:'Stamina + PT #2',
+  3:'Chs 8–9: comparative + passage themes',4:'Ch 10 + Vegas trip (May 22–25)',
+  5:'PT #1 (May 31) + review',6:'Stamina + PT #2',
   7:'RC mapping speed + ReChallenge',8:'PT #3 — midpoint check',
   9:'Section stamina',10:'PT #4',11:'PT #5',12:'PT #6 — final full PT',
   13:'Sharpen, don\'t rebuild',14:'Final week + test day'
@@ -373,12 +373,12 @@ function wkRange(days){
   return fm===lm?`${fl}–${ll.split(' ')[1]}`:`${fl}–${ll}`;
 }
 const CAL_WK_LABEL={
-  '2026-04-27':'PowerScore Chs 1–4: RC fundamentals',
-  '2026-05-04':'Chs 5–6: LR question types + CondR',
+  '2026-04-27':'PowerScore Chs 1–3: RC fundamentals',
+  '2026-05-04':'Chs 4–6: passage elements + question types + CondR',
   '2026-05-11':'Chs 7–9: full passages + comparative',
-  '2026-05-18':'Ch 10: section strategy + PT #1',
-  '2026-05-25':'PT #1 review + first timed sections',
-  '2026-06-01':'Timed sections + PT #2',
+  '2026-05-18':'CondR/LR + Vegas trip (May 21–25)',
+  '2026-05-25':'CondR/LR wrap-up + PT #1 (May 31)',
+  '2026-06-01':'PT #1 review + timed sections + PT #2',
   '2026-06-08':'PT #2 review + RC speed',
   '2026-06-15':'Section drilling + PT #3 midpoint',
   '2026-06-22':'PT #3 review + section stamina',
@@ -449,6 +449,18 @@ function ptChart(){
   </svg></div>`;
 }
 
+// ── TIME ESTIMATES ─────────────────────────────────────────────────────────
+function getTimeEst(d){
+  if(d.types.includes('rest')) return '';
+  if(d.types.includes('pt')) return '2.5 hrs';
+  if(d.types.includes('review')&&d.task.toLowerCase().startsWith('pt #')) return '90 min';
+  if(d.date==='2026-05-22') return '45 min — optional if traveling';
+  if(d.date==='2026-05-02') return '45 min';
+  if(d.date==='2026-05-04') return '75 min';
+  const dow=new Date(d.date+'T00:00:00').getDay();
+  return(dow===0||dow===6)?'75 min':'45 min';
+}
+
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
 function renderDashboard(){
   const el=document.getElementById('dashboard');
@@ -477,7 +489,7 @@ function renderDashboard(){
       const tc=isDone?'#15803D':'var(--purple)';
       h+=`<div style="background:${bg};border:${br};border-radius:12px;padding:16px;margin-bottom:10px">
         <div style="font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:${tc};text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">
-          ${isDone?'✓ Done — ':''}${entry.label} · Wk ${entry.week}
+          ${isDone?'✓ Done — ':''}${entry.label} · Wk ${entry.week}${getTimeEst(entry)?' · '+getTimeEst(entry):''}
         </div>
         <div style="font-size:14px;font-weight:500;line-height:1.55;margin-bottom:10px;${isDone?'color:var(--muted)':''}">${esc(entry.task)}</div>
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${tags(entry.types)}</div>
@@ -573,7 +585,7 @@ function renderSessions(){
       const isRest=d.types.includes('rest');
       const note=S.done[d.date]?.note||'';
       h+=`<div class="day-row${isToday?' is-today':''}${isRest?' is-rest':''}">
-        <div class="day-dname">${d.label}</div>
+        <div class="day-dname">${d.label}${getTimeEst(d)?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);margin-top:2px">${getTimeEst(d)}</div>`:''}</div>
         <div>
           <div class="day-task">${esc(d.task)}</div>
           <div class="day-tags">${tags(d.types)}</div>
