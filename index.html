@@ -335,7 +335,7 @@ async function loadRemote(){
 }
 
 // ── UTILS ──────────────────────────────────────────────────────────────────
-function tod(){ return new Date().toISOString().split('T')[0]; }
+function tod(){ return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}); }
 function daysUntil(ds){
   const n=new Date(); n.setHours(0,0,0,0);
   return Math.ceil((new Date(ds+'T00:00:00')-n)/86400000);
