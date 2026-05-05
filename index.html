@@ -299,8 +299,9 @@ const S = {
   done:     load('done',{}),       // { 'YYYY-MM-DD': {ts, note} }
   pts:      load('pts',[]),        // [{num,date,score,lr,rc,note}]
   misses:   load('misses',[]),     // [{ts,section,type,tags:[],correct,ref,trap,note}] — type = single 7sage type id; tags = stimulus tag ids; note = lesson
+  sessions: load('sessions',[]),   // [{ts,date,topics:[],total,correct,note}] — drill sessions; topics = stimulus tag ids drilled
 };
-function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses); syncRemote(); }
+function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('sessions',S.sessions); syncRemote(); }
 
 function setSyncDot(state){
   const d=document.getElementById('sync-dot'); if(!d) return;
@@ -310,7 +311,7 @@ function setSyncDot(state){
 }
 async function syncRemote(){
   setSyncDot('syncing');
-  const data={done:S.done,pts:S.pts,misses:S.misses};
+  const data={done:S.done,pts:S.pts,misses:S.misses,sessions:S.sessions};
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/state`,{
       method:'POST',
@@ -332,7 +333,8 @@ async function loadRemote(){
       if(d.done)      S.done=d.done;
       if(d.pts)       S.pts=d.pts;
       if(d.misses)    S.misses=d.misses;
-      save('done',S.done);save('pts',S.pts);save('misses',S.misses);
+      if(d.sessions)  S.sessions=d.sessions;
+      save('done',S.done);save('pts',S.pts);save('misses',S.misses);save('sessions',S.sessions);
     }
     setSyncDot('ok');
   }catch{ setSyncDot('err'); }
@@ -892,6 +894,86 @@ function renderMisses(){
     }
   }
 
+  // ── Drill session analytics ──
+  if(S.sessions.length){
+    const topicAgg={};
+    let totalQ=0,totalC=0;
+    S.sessions.forEach(s=>{
+      totalQ+=+s.total||0; totalC+=+s.correct||0;
+      (s.topics||[]).forEach(t=>{
+        if(!topicAgg[t]) topicAgg[t]={tot:0,cor:0,sess:0};
+        topicAgg[t].tot+=+s.total||0;
+        topicAgg[t].cor+=+s.correct||0;
+        topicAgg[t].sess++;
+      });
+    });
+    const topics=Object.entries(topicAgg).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
+    const overallPct=totalQ?Math.round(totalC/totalQ*100):0;
+    h+=`<div class="card card-sm" style="margin-bottom:10px">
+      <div class="sec-title">Drill Accuracy <span style="color:var(--faint);text-transform:none;letter-spacing:0">· ${totalC}/${totalQ} (${overallPct}%) across ${S.sessions.length} session${S.sessions.length===1?'':'s'}</span></div>`;
+    if(topics.length){
+      topics.forEach(([id,v])=>{
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barW=Math.max(2,pct);
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        h+=`<div class="weak-row">
+          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${barW}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+    } else {
+      h+=`<div style="font-size:12px;color:var(--faint);padding:4px 0">No topic-tagged sessions yet.</div>`;
+    }
+    h+=`</div>`;
+
+    const recentSess=S.sessions.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Drills</div>`;
+    recentSess.forEach(s=>{
+      const origIdx=S.sessions.indexOf(s);
+      const pct=s.total?Math.round(s.correct/s.total*100):0;
+      const chips=(s.topics||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
+      h+=`<div class="miss-item">
+        <span class="miss-badge" style="background:var(--purple-lt);color:var(--purple)">${s.correct}/${s.total} · ${pct}%</span>
+        <div style="flex:1;min-width:0">
+          ${chips?`<div class="chip-row">${chips}</div>`:''}
+          ${s.note?`<div style="font-size:12px;margin-bottom:2px">${esc(s.note)}</div>`:''}
+          <div class="miss-meta">${fmtDate(s.date)}</div>
+        </div>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editSession(${origIdx})" title="Edit">✎</button>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delSession(${origIdx})" title="Delete">×</button>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // ── Log Drill Session form ──
+  const editingS=editingSessionIdx!=null?S.sessions[editingSessionIdx]:null;
+  h+=`<div class="card">
+    <div class="sec-title">${editingS?'Edit Drill Session':'Log Drill Session'}</div>
+    <div class="form2">
+      <div class="fg"><label>Date</label>
+        <input type="date" id="s-date" value="${editingS?.date||tod()}">
+      </div>
+      <div class="fg"><label>Total</label>
+        <input type="number" id="s-total" min="1" max="200" value="${editingS?.total??20}">
+      </div>
+    </div>
+    <div class="fg"><label>Correct</label>
+      <input type="number" id="s-correct" min="0" max="200" value="${editingS?.correct??''}">
+    </div>
+    <div class="fg">
+      <label>Topics <span style="color:var(--faint);font-weight:normal">(stimulus tags drilled — multi)</span></label>
+      <div class="chip-row" id="s-topics"></div>
+    </div>
+    <div class="fg"><label>Note <span style="color:var(--faint);font-weight:normal">(optional)</span></label>
+      <input type="text" id="s-note" placeholder="e.g. Ch 4 drill, untimed" value="${esc(editingS?.note||'')}">
+    </div>
+    <button class="btn btn-primary" onclick="logSession()">${editingS?'Update':'Log Session'}</button>
+    ${editingS?`<button class="btn btn-secondary" style="margin-left:8px" onclick="cancelEditSession()">Cancel</button>`:''}
+  </div>`;
+
   const editing=editingIdx!=null?S.misses[editingIdx]:null;
   h+=`<div class="card">
     <div class="sec-title">${editing?'Edit Entry':'Log Question'}</div>
@@ -958,40 +1040,75 @@ function renderMisses(){
   refreshMissTypes();
   if(editing) document.getElementById('m-type').value=editing.type;
   refreshMissTags(editing?.tags||[]);
+  fillChipRow('s-topics', STIMULUS_TAGS, editingS?.topics||[]);
 }
 
 let editingIdx=null;
+let editingSessionIdx=null;
+
+function logSession(){
+  const date=document.getElementById('s-date').value||tod();
+  const totalRaw=document.getElementById('s-total').value;
+  const correctRaw=document.getElementById('s-correct').value;
+  if(totalRaw===''||correctRaw==='') return;
+  const total=+totalRaw, correct=+correctRaw;
+  const note=(document.getElementById('s-note').value||'').trim();
+  const topics=chipsSelected('s-topics');
+  if(!total||correct<0||correct>total) return;
+  if(editingSessionIdx!=null){
+    const orig=S.sessions[editingSessionIdx];
+    S.sessions[editingSessionIdx]={...orig,date,topics,total,correct,note};
+    editingSessionIdx=null;
+  } else {
+    S.sessions.push({ts:Date.now(),date,topics,total,correct,note});
+  }
+  persist(); renderMisses();
+}
+function editSession(idx){
+  editingSessionIdx=idx; renderMisses();
+  document.getElementById('misses')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cancelEditSession(){
+  editingSessionIdx=null; renderMisses();
+}
+function delSession(idx){
+  if(editingSessionIdx===idx) editingSessionIdx=null;
+  else if(editingSessionIdx!=null && idx<editingSessionIdx) editingSessionIdx--;
+  S.sessions.splice(idx,1); persist(); renderMisses();
+}
+
+function fillChipRow(rowId, items, selected){
+  const row=document.getElementById(rowId);
+  if(!row) return;
+  const sel=new Set(selected||[]);
+  row.innerHTML=items.map(t=>`<span class="chip${sel.has(t.id)?' active':''}" data-tag="${t.id}" onclick="toggleChip(this)">${t.label}</span>`).join('');
+}
+function toggleChip(el){ el.classList.toggle('active'); }
+function chipsSelected(rowId){
+  return Array.from(document.querySelectorAll(`#${rowId} .chip.active`)).map(c=>c.dataset.tag);
+}
 
 function refreshMissTypes(){
   const s=document.getElementById('m-section')?.value;
   const sel=document.getElementById('m-type');
   if(!sel) return;
   sel.innerHTML=QTYPES.filter(q=>q.s===s).map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
-  refreshMissTags(getSelectedTags());
+  refreshMissTags(chipsSelected('m-tags'));
 }
 function refreshMissTags(selected){
   const s=document.getElementById('m-section')?.value;
   const wrap=document.getElementById('m-tags-wrap');
-  const row=document.getElementById('m-tags');
-  if(!row||!wrap) return;
+  if(!wrap) return;
   const avail=STIMULUS_TAGS.filter(t=>t.s===s);
-  if(!avail.length){ wrap.style.display='none'; row.innerHTML=''; return; }
+  if(!avail.length){ wrap.style.display='none'; const row=document.getElementById('m-tags'); if(row) row.innerHTML=''; return; }
   wrap.style.display='';
-  const sel=new Set(selected||[]);
-  row.innerHTML=avail.map(t=>`<span class="chip${sel.has(t.id)?' active':''}" data-tag="${t.id}" onclick="toggleTag('${t.id}')">${t.label}</span>`).join('');
-}
-function toggleTag(id){
-  const el=document.querySelector(`#m-tags .chip[data-tag="${id}"]`);
-  if(el) el.classList.toggle('active');
-}
-function getSelectedTags(){
-  return Array.from(document.querySelectorAll('#m-tags .chip.active')).map(c=>c.dataset.tag);
+  fillChipRow('m-tags', avail, selected);
 }
 function logMiss(){
   const section=document.getElementById('m-section').value;
   const type=document.getElementById('m-type').value;
   const correct=document.getElementById('m-correct').value==='1';
-  const tags=getSelectedTags();
+  const tags=chipsSelected('m-tags');
   const ref=(document.getElementById('m-ref').value||'').trim();
   const trap=(document.getElementById('m-trap').value||'').trim();
   const note=(document.getElementById('m-note').value||'').trim();
