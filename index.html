@@ -106,6 +106,9 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 .chip{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:10px;background:#F1F0EC;color:var(--muted);border:1px solid transparent;cursor:pointer;user-select:none;white-space:nowrap}
 .chip.active{background:var(--purple-lt);color:var(--purple);border-color:var(--purple-border)}
 .chip.readonly{cursor:default;background:var(--purple-lt);color:var(--purple)}
+.zone-hdr{display:flex;align-items:center;gap:10px;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--purple);text-transform:uppercase;letter-spacing:.12em;margin:18px 0 8px;padding:0 2px}
+.zone-hdr:first-child{margin-top:4px}
+.zone-hdr::after{content:'';flex:1;height:1px;background:var(--border)}
 
 .weak-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F5F4F0}
 .weak-row:last-child{border-bottom:none}
@@ -141,9 +144,9 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 
 <nav id="nav">
   <button class="active" data-tab="dashboard">Dashboard</button>
-  <button data-tab="sessions">Sessions</button>
+  <button data-tab="plan">Plan</button>
   <button data-tab="pt">PT Scores</button>
-  <button data-tab="misses">Misses</button>
+  <button data-tab="practice">Practice</button>
   <span style="display:flex;align-items:center;margin-left:auto;padding-right:12px;flex-shrink:0">
     <span id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:#ccc;display:inline-block;cursor:default" title="Connecting..."></span>
   </span>
@@ -151,9 +154,9 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 
 <main>
   <div id="dashboard" class="section active"></div>
-  <div id="sessions"  class="section"></div>
+  <div id="plan"      class="section"></div>
   <div id="pt"        class="section"></div>
-  <div id="misses"    class="section"></div>
+  <div id="practice"  class="section"></div>
 </main>
 
 <script>
@@ -551,15 +554,15 @@ function renderDashboard(){
 function markTod(){
   const note=(document.getElementById('td-note')?.value||'').trim();
   S.done[tod()]={ts:Date.now(),note};
-  persist(); renderDashboard(); renderSessions();
+  persist(); renderDashboard(); renderPlan();
 }
 function unmarkTod(){
-  delete S.done[tod()]; persist(); renderDashboard(); renderSessions();
+  delete S.done[tod()]; persist(); renderDashboard(); renderPlan();
 }
 
 // ── SESSIONS ───────────────────────────────────────────────────────────────
-function renderSessions(){
-  const el=document.getElementById('sessions');
+function renderPlan(){
+  const el=document.getElementById('plan');
   const td=tod();
   const todayMon=getMondayKey(td);
 
@@ -633,18 +636,18 @@ function toggleWk(wk){
 function markDay(date){
   const note=(document.getElementById(`n-${date}`)?.value||'').trim();
   S.done[date]={ts:Date.now(),note}; persist();
-  renderSessions(); if(date===tod()) renderDashboard();
+  renderPlan(); if(date===tod()) renderDashboard();
 }
 function unmarkDay(date){
   delete S.done[date]; persist();
-  renderSessions(); if(date===tod()) renderDashboard();
+  renderPlan(); if(date===tod()) renderDashboard();
 }
 function editNote(date){
   const cur=S.done[date]?.note||'';
   const n=prompt('Edit note:',cur);
   if(n===null) return;
   S.done[date]={...(S.done[date]||{}),note:n,ts:Date.now()}; persist();
-  renderSessions(); renderDashboard();
+  renderPlan(); renderDashboard();
 }
 
 // ── PT TRACKER ─────────────────────────────────────────────────────────────
@@ -817,8 +820,8 @@ const STIMULUS_TAGS = [
 ];
 function tagLabel(id){ return STIMULUS_TAGS.find(t=>t.id===id)?.label||id; }
 
-function renderMisses(){
-  const el=document.getElementById('misses');
+function renderPractice(){
+  const el=document.getElementById('practice');
   const log=S.misses;
 
   // Aggregate by question type
@@ -847,109 +850,13 @@ function renderMisses(){
 
   let h='';
 
-  if(top3.length){
-    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
-    top3.forEach(([id,v],i)=>{
-      const pct=Math.round((v.miss/v.tot)*100);
-      h+=`<div class="weak-row">
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
-        <span class="weak-name">${qtLabel(id)}</span>
-        <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
-        <span class="weak-ct">${v.miss} miss</span>
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-      </div>`;
-    });
-    h+=`</div>`;
-  }
-
-  if(byMiss.length>3){
-    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
-    byMiss.forEach(([id,v])=>{
-      const qt=QTYPES.find(q=>q.id===id);
-      const pct=Math.round((v.miss/v.tot)*100);
-      h+=`<div class="weak-row">
-        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
-        <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
-        <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
-        <span class="weak-ct">${v.miss}/${v.tot}</span>
-      </div>`;
-    });
-    h+=`</div>`;
-  }
-
-  if(tagByMiss.length){
-    const tagTop=tagByMiss.filter(([,v])=>v.miss>0).slice(0,8);
-    if(tagTop.length){
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
-      tagTop.forEach(([id,v])=>{
-        const pct=Math.round((v.miss/v.tot)*100);
-        h+=`<div class="weak-row">
-          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
-          <span class="weak-ct">${v.miss}/${v.tot}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-        </div>`;
-      });
-      h+=`</div>`;
-    }
-  }
-
-  // ── Drill session analytics ──
-  if(S.sessions.length){
-    const topicAgg={};
-    let totalQ=0,totalC=0;
-    S.sessions.forEach(s=>{
-      totalQ+=+s.total||0; totalC+=+s.correct||0;
-      (s.topics||[]).forEach(t=>{
-        if(!topicAgg[t]) topicAgg[t]={tot:0,cor:0,sess:0};
-        topicAgg[t].tot+=+s.total||0;
-        topicAgg[t].cor+=+s.correct||0;
-        topicAgg[t].sess++;
-      });
-    });
-    const topics=Object.entries(topicAgg).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
-    const overallPct=totalQ?Math.round(totalC/totalQ*100):0;
-    h+=`<div class="card card-sm" style="margin-bottom:10px">
-      <div class="sec-title">Drill Accuracy <span style="color:var(--faint);text-transform:none;letter-spacing:0">· ${totalC}/${totalQ} (${overallPct}%) across ${S.sessions.length} session${S.sessions.length===1?'':'s'}</span></div>`;
-    if(topics.length){
-      topics.forEach(([id,v])=>{
-        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
-        const barW=Math.max(2,pct);
-        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
-        h+=`<div class="weak-row">
-          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${barW}%;background:${barColor}"></div></div>
-          <span class="weak-ct">${v.cor}/${v.tot}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-        </div>`;
-      });
-    } else {
-      h+=`<div style="font-size:12px;color:var(--faint);padding:4px 0">No topic-tagged sessions yet.</div>`;
-    }
-    h+=`</div>`;
-
-    const recentSess=S.sessions.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
-    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Drills</div>`;
-    recentSess.forEach(s=>{
-      const origIdx=S.sessions.indexOf(s);
-      const pct=s.total?Math.round(s.correct/s.total*100):0;
-      const chips=(s.topics||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
-      h+=`<div class="miss-item">
-        <span class="miss-badge" style="background:var(--purple-lt);color:var(--purple)">${s.correct}/${s.total} · ${pct}%</span>
-        <div style="flex:1;min-width:0">
-          ${chips?`<div class="chip-row">${chips}</div>`:''}
-          ${s.note?`<div style="font-size:12px;margin-bottom:2px">${esc(s.note)}</div>`:''}
-          <div class="miss-meta">${fmtDate(s.date)}</div>
-        </div>
-        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editSession(${origIdx})" title="Edit">✎</button>
-        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delSession(${origIdx})" title="Delete">×</button>
-      </div>`;
-    });
-    h+=`</div>`;
-  }
-
-  // ── Log Drill Session form ──
+  // Editing state declared up front — referenced by forms below and by post-render setup
   const editingS=editingSessionIdx!=null?S.sessions[editingSessionIdx]:null;
+  const editing=editingIdx!=null?S.misses[editingIdx]:null;
+
+  // ── Zone: TODAY ─────────────────────────────────────────────
+  h+=`<div class="zone-hdr">Today</div>`;
+
   h+=`<div class="card">
     <div class="sec-title">${editingS?'Edit Drill Session':'Log Drill Session'}</div>
     <div class="form2">
@@ -974,7 +881,6 @@ function renderMisses(){
     ${editingS?`<button class="btn btn-secondary" style="margin-left:8px" onclick="cancelEditSession()">Cancel</button>`:''}
   </div>`;
 
-  const editing=editingIdx!=null?S.misses[editingIdx]:null;
   h+=`<div class="card">
     <div class="sec-title">${editing?'Edit Entry':'Log Question'}</div>
     <div class="form2">
@@ -1008,28 +914,142 @@ function renderMisses(){
     ${editing?`<button class="btn btn-secondary" style="margin-left:8px" onclick="cancelEdit()">Cancel</button>`:''}
   </div>`;
 
-  if(log.length){
-    const recent=log.slice().reverse().slice(0,25);
-    h+=`<div class="card card-sm" style="margin-top:10px"><div class="sec-title">Recent Log</div>`;
-    recent.forEach((m,i)=>{
-      const orig=log.length-1-i;
-      const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
-      const tc=m.correct?'var(--green)':'var(--red)';
-      const tagChips=(m.tags||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
-      h+=`<div class="miss-item">
-        <span class="miss-badge" style="background:${bg};color:${tc}">${m.correct?'✓':'✗'} ${qtLabel(m.type)}</span>
-        <div style="flex:1;min-width:0">
-          ${m.ref?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);margin-bottom:2px">${esc(m.ref)}</div>`:''}
-          ${tagChips?`<div class="chip-row">${tagChips}</div>`:''}
-          ${m.trap?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px"><span style="color:var(--faint)">trap:</span> ${esc(m.trap)}</div>`:''}
-          ${m.note?`<div style="font-size:12px;margin-bottom:2px">${esc(m.note)}</div>`:''}
-          <div class="miss-meta">${m.section} · ${new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-        </div>
-        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editMiss(${orig})" title="Edit">✎</button>
-        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delMiss(${orig})" title="Delete">×</button>
-      </div>`;
-    });
-    h+=`</div>`;
+  // ── Zone: ANALYTICS ─────────────────────────────────────────
+  const hasAnalytics=S.sessions.length||top3.length||tagByMiss.length||byMiss.length>3;
+  if(hasAnalytics){
+    h+=`<div class="zone-hdr">Analytics</div>`;
+
+    if(S.sessions.length){
+      const topicAgg={};
+      let totalQ=0,totalC=0;
+      S.sessions.forEach(s=>{
+        totalQ+=+s.total||0; totalC+=+s.correct||0;
+        (s.topics||[]).forEach(t=>{
+          if(!topicAgg[t]) topicAgg[t]={tot:0,cor:0,sess:0};
+          topicAgg[t].tot+=+s.total||0;
+          topicAgg[t].cor+=+s.correct||0;
+          topicAgg[t].sess++;
+        });
+      });
+      const topics=Object.entries(topicAgg).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
+      const overallPct=totalQ?Math.round(totalC/totalQ*100):0;
+      h+=`<div class="card card-sm" style="margin-bottom:10px">
+        <div class="sec-title">Drill Accuracy <span style="color:var(--faint);text-transform:none;letter-spacing:0">· ${totalC}/${totalQ} (${overallPct}%) across ${S.sessions.length} session${S.sessions.length===1?'':'s'}</span></div>`;
+      if(topics.length){
+        topics.forEach(([id,v])=>{
+          const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+          const barW=Math.max(2,pct);
+          const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+          h+=`<div class="weak-row">
+            <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+            <div class="weak-bar-bg"><div class="weak-bar" style="width:${barW}%;background:${barColor}"></div></div>
+            <span class="weak-ct">${v.cor}/${v.tot}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+          </div>`;
+        });
+      } else {
+        h+=`<div style="font-size:12px;color:var(--faint);padding:4px 0">No topic-tagged sessions yet.</div>`;
+      }
+      h+=`</div>`;
+    }
+
+    if(top3.length){
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
+      top3.forEach(([id,v],i)=>{
+        const pct=Math.round((v.miss/v.tot)*100);
+        h+=`<div class="weak-row">
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
+          <span class="weak-name">${qtLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
+          <span class="weak-ct">${v.miss} miss</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+
+    if(tagByMiss.length){
+      const tagTop=tagByMiss.filter(([,v])=>v.miss>0).slice(0,8);
+      if(tagTop.length){
+        h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
+        tagTop.forEach(([id,v])=>{
+          const pct=Math.round((v.miss/v.tot)*100);
+          h+=`<div class="weak-row">
+            <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+            <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
+            <span class="weak-ct">${v.miss}/${v.tot}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+          </div>`;
+        });
+        h+=`</div>`;
+      }
+    }
+
+    if(byMiss.length>3){
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
+      byMiss.forEach(([id,v])=>{
+        const qt=QTYPES.find(q=>q.id===id);
+        const pct=Math.round((v.miss/v.tot)*100);
+        h+=`<div class="weak-row">
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
+          <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
+          <span class="weak-ct">${v.miss}/${v.tot}</span>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+  }
+
+  // ── Zone: HISTORY ───────────────────────────────────────────
+  const hasHistory=S.sessions.length||log.length;
+  if(hasHistory){
+    h+=`<div class="zone-hdr">History</div>`;
+
+    if(S.sessions.length){
+      const recentSess=S.sessions.slice().sort((a,b)=>b.ts-a.ts).slice(0,5);
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Drills</div>`;
+      recentSess.forEach(s=>{
+        const origIdx=S.sessions.indexOf(s);
+        const pct=s.total?Math.round(s.correct/s.total*100):0;
+        const chips=(s.topics||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
+        h+=`<div class="miss-item">
+          <span class="miss-badge" style="background:var(--purple-lt);color:var(--purple)">${s.correct}/${s.total} · ${pct}%</span>
+          <div style="flex:1;min-width:0">
+            ${chips?`<div class="chip-row">${chips}</div>`:''}
+            ${s.note?`<div style="font-size:12px;margin-bottom:2px">${esc(s.note)}</div>`:''}
+            <div class="miss-meta">${fmtDate(s.date)}</div>
+          </div>
+          <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editSession(${origIdx})" title="Edit">✎</button>
+          <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delSession(${origIdx})" title="Delete">×</button>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+
+    if(log.length){
+      const recent=log.slice().reverse().slice(0,25);
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Misses</div>`;
+      recent.forEach((m,i)=>{
+        const orig=log.length-1-i;
+        const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
+        const tc=m.correct?'var(--green)':'var(--red)';
+        const tagChips=(m.tags||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
+        h+=`<div class="miss-item">
+          <span class="miss-badge" style="background:${bg};color:${tc}">${m.correct?'✓':'✗'} ${qtLabel(m.type)}</span>
+          <div style="flex:1;min-width:0">
+            ${m.ref?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);margin-bottom:2px">${esc(m.ref)}</div>`:''}
+            ${tagChips?`<div class="chip-row">${tagChips}</div>`:''}
+            ${m.trap?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px"><span style="color:var(--faint)">trap:</span> ${esc(m.trap)}</div>`:''}
+            ${m.note?`<div style="font-size:12px;margin-bottom:2px">${esc(m.note)}</div>`:''}
+            <div class="miss-meta">${m.section} · ${new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+          </div>
+          <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editMiss(${orig})" title="Edit">✎</button>
+          <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delMiss(${orig})" title="Delete">×</button>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
   }
 
   el.innerHTML=h;
@@ -1062,19 +1082,19 @@ function logSession(){
   } else {
     S.sessions.push({ts:Date.now(),date,topics,total,correct,note});
   }
-  persist(); renderMisses();
+  persist(); renderPractice();
 }
 function editSession(idx){
-  editingSessionIdx=idx; renderMisses();
-  document.getElementById('misses')?.scrollIntoView({behavior:'smooth',block:'start'});
+  editingSessionIdx=idx; renderPractice();
+  document.getElementById('practice')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function cancelEditSession(){
-  editingSessionIdx=null; renderMisses();
+  editingSessionIdx=null; renderPractice();
 }
 function delSession(idx){
   if(editingSessionIdx===idx) editingSessionIdx=null;
   else if(editingSessionIdx!=null && idx<editingSessionIdx) editingSessionIdx--;
-  S.sessions.splice(idx,1); persist(); renderMisses();
+  S.sessions.splice(idx,1); persist(); renderPractice();
 }
 
 function fillChipRow(rowId, items, selected){
@@ -1119,19 +1139,19 @@ function logMiss(){
   } else {
     S.misses.push({ts:Date.now(),section,type,tags,correct,ref,trap,note});
   }
-  persist(); renderMisses();
+  persist(); renderPractice();
 }
 function editMiss(idx){
-  editingIdx=idx; renderMisses();
-  document.getElementById('misses')?.scrollIntoView({behavior:'smooth',block:'start'});
+  editingIdx=idx; renderPractice();
+  document.getElementById('practice')?.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function cancelEdit(){
-  editingIdx=null; renderMisses();
+  editingIdx=null; renderPractice();
 }
 function delMiss(idx){
   if(editingIdx===idx) editingIdx=null;
   else if(editingIdx!=null && idx<editingIdx) editingIdx--;
-  S.misses.splice(idx,1); persist(); renderMisses();
+  S.misses.splice(idx,1); persist(); renderPractice();
 }
 
 
@@ -1144,9 +1164,9 @@ document.querySelectorAll('nav button').forEach(btn=>{
     const tab=btn.dataset.tab;
     document.getElementById(tab).classList.add('active');
 
-    if(tab==='sessions')  renderSessions();
+    if(tab==='plan')      renderPlan();
     if(tab==='pt')        renderPT();
-    if(tab==='misses')    renderMisses();
+    if(tab==='practice')  renderPractice();
   });
 });
 
