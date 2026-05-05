@@ -102,6 +102,10 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 .miss-item:last-child{border-bottom:none}
 .miss-badge{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;flex-shrink:0}
 .miss-meta{font-size:11px;color:var(--muted)}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.chip{font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:10px;background:#F1F0EC;color:var(--muted);border:1px solid transparent;cursor:pointer;user-select:none;white-space:nowrap}
+.chip.active{background:var(--purple-lt);color:var(--purple);border-color:var(--purple-border)}
+.chip.readonly{cursor:default;background:var(--purple-lt);color:var(--purple)}
 
 .weak-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F5F4F0}
 .weak-row:last-child{border-bottom:none}
@@ -294,7 +298,7 @@ function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
 const S = {
   done:     load('done',{}),       // { 'YYYY-MM-DD': {ts, note} }
   pts:      load('pts',[]),        // [{num,date,score,lr,rc,note}]
-  misses:   load('misses',[]),     // [{ts,section,type,correct,note}]
+  misses:   load('misses',[]),     // [{ts,section,type,tags:[],correct,ref,trap,note}] — type = single 7sage type id; tags = stimulus tag ids; note = lesson
 };
 function persist(){ save('done',S.done);save('pts',S.pts);save('misses',S.misses); syncRemote(); }
 
@@ -740,35 +744,85 @@ function delPT(num){
 }
 
 // ── MISS TRACKER ───────────────────────────────────────────────────────────
+// Question types — single per question. Mirrors 7sage's official taxonomy
+// (17 LR, 13 RC). https://7sage.com/lr-question-types · /rc-question-types
 const QTYPES = [
-  {id:'condr',   label:'CondR',              s:'LR'},
-  {id:'causr',   label:'CausR / Strengthen', s:'LR'},
-  {id:'flaw',    label:'Flaw',               s:'LR'},
-  {id:'assumption',label:'Assumption (NA)',  s:'LR'},
-  {id:'weaken',  label:'Weaken',             s:'LR'},
-  {id:'mbt',     label:'Must Be True',       s:'LR'},
-  {id:'inference',label:'Inference / MSS',   s:'LR'},
-  {id:'method',  label:'Method of Reasoning',s:'LR'},
-  {id:'principle',label:'Principle',         s:'LR'},
-  {id:'parallel',label:'Parallel Reasoning', s:'LR'},
-  {id:'resolve', label:'Resolve / Explain',  s:'LR'},
-  {id:'rc-mbt',  label:'RC: Must Be True',   s:'RC'},
-  {id:'rc-mp',   label:'RC: Main Point',     s:'RC'},
-  {id:'rc-inf',  label:'RC: Inference',      s:'RC'},
-  {id:'rc-att',  label:'RC: Author Attitude',s:'RC'},
-  {id:'rc-sw',   label:'RC: Strengthen/Weaken',s:'RC'},
-  {id:'rc-vocab',label:'RC: Vocab in Context',s:'RC'},
-  {id:'rc-comp', label:'RC: Comparative',    s:'RC'},
+  // LR — Argument structure
+  {id:'mc',       label:'Main Conclusion',           s:'LR'},
+  {id:'argpart',  label:'Argument Part',             s:'LR'},
+  {id:'mor',      label:'Method of Reasoning',       s:'LR'},
+  // LR — Assumptions / flaws
+  {id:'flaw',     label:'Flaw',                      s:'LR'},
+  {id:'na',       label:'Necessary Assumption',      s:'LR'},
+  {id:'sa',       label:'Sufficient Assumption',     s:'LR'},
+  {id:'streng',   label:'Strengthen',                s:'LR'},
+  {id:'weak',     label:'Weaken',                    s:'LR'},
+  {id:'eval',     label:'Evaluate',                  s:'LR'},
+  // LR — Inferences
+  {id:'mbt',      label:'Must Be True',              s:'LR'},
+  {id:'mss',      label:'Most Strongly Supported',   s:'LR'},
+  // LR — Principles
+  {id:'psa',      label:'PSA: Find the Rule',        s:'LR'},
+  {id:'psaa',     label:'PSA: Apply the Rule',       s:'LR'},
+  // LR — Parallel
+  {id:'para',     label:'Parallel MoR',              s:'LR'},
+  {id:'pf',       label:'Parallel Flaw',             s:'LR'},
+  // LR — Other
+  {id:'rre',      label:'Resolve / Reconcile / Explain', s:'LR'},
+  {id:'pai',      label:'Point at Issue',            s:'LR'},
+  // RC — Overall structure
+  {id:'rc-mp',    label:'Main Point',                s:'RC'},
+  {id:'rc-pp',    label:'Purpose of Passage',        s:'RC'},
+  {id:'rc-org',   label:'Describe Organization',     s:'RC'},
+  // RC — Internal structure
+  {id:'rc-pop',   label:'Purpose of Paragraph',      s:'RC'},
+  {id:'rc-mic',   label:'Meaning in Context',        s:'RC'},
+  {id:'rc-pic',   label:'Purpose in Context',        s:'RC'},
+  // RC — Stated / implied
+  {id:'rc-stated',label:'Stated',                    s:'RC'},
+  {id:'rc-impl',  label:'Implied',                   s:'RC'},
+  {id:'rc-att',   label:'Author\'s Attitude',        s:'RC'},
+  // RC — Other
+  {id:'rc-app',   label:'Application',               s:'RC'},
+  {id:'rc-ana',   label:'RC Analogy',                s:'RC'},
+  {id:'rc-lc',    label:'Logical Continuation',      s:'RC'},
+  {id:'rc-wse',   label:'Weaken / Strengthen / Eval',s:'RC'},
 ];
 function qtLabel(id){ return QTYPES.find(q=>q.id===id)?.label||id; }
+
+// Stimulus tags — multi per question. Mirrors 7sage's 15 LR stimulus tags
+// plus a few sub-tags (SuffvNec, Factors) seen in their assignment tagging.
+// https://7sage.com/blog/new-lr-tags-in-7sage
+const STIMULUS_TAGS = [
+  {id:'an',       label:'Analogy',         s:'LR'},
+  {id:'causr',    label:'CausR',           s:'LR'},
+  {id:'condr',    label:'CondR',           s:'LR'},
+  {id:'elimopt',  label:'ElimOpt',         s:'LR'},
+  {id:'fvbvk',    label:'FvBvK',           s:'LR'},
+  {id:'kiu',      label:'KIU',             s:'LR'},
+  {id:'lsvfc',    label:'LSvFC',           s:'LR'},
+  {id:'linka',    label:'LinkA',           s:'LR'},
+  {id:'math',     label:'Math',            s:'LR'},
+  {id:'neteff',   label:'NetEff',          s:'LR'},
+  {id:'pvw',      label:'PvW',             s:'LR'},
+  {id:'quant',    label:'Quant',           s:'LR'},
+  {id:'ruleapp',  label:'RuleApp',         s:'LR'},
+  {id:'smpl',     label:'Smpl',            s:'LR'},
+  {id:'valjudg',  label:'ValJudg',         s:'LR'},
+  // Sub-tags 7sage uses inside drill tagging
+  {id:'suffvnec', label:'SuffvNec',        s:'LR'},
+  {id:'factors',  label:'Factors',         s:'LR'},
+];
+function tagLabel(id){ return STIMULUS_TAGS.find(t=>t.id===id)?.label||id; }
 
 function renderMisses(){
   const el=document.getElementById('misses');
   const log=S.misses;
 
-  // Aggregate
+  // Aggregate by question type
   const agg={};
   log.forEach(m=>{
+    if(!m.type) return;
     if(!agg[m.type]) agg[m.type]={tot:0,miss:0};
     agg[m.type].tot++;
     if(!m.correct) agg[m.type].miss++;
@@ -777,10 +831,22 @@ function renderMisses(){
   const maxM=Math.max(1,...byMiss.map(([,v])=>v.miss));
   const top3=byMiss.filter(([,v])=>v.miss>0).slice(0,3);
 
+  // Aggregate by stimulus tag
+  const tagAgg={};
+  log.forEach(m=>{
+    (m.tags||[]).forEach(t=>{
+      if(!tagAgg[t]) tagAgg[t]={tot:0,miss:0};
+      tagAgg[t].tot++;
+      if(!m.correct) tagAgg[t].miss++;
+    });
+  });
+  const tagByMiss=Object.entries(tagAgg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
+  const tagMaxM=Math.max(1,...tagByMiss.map(([,v])=>v.miss));
+
   let h='';
 
   if(top3.length){
-    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Areas</div>`;
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
     top3.forEach(([id,v],i)=>{
       const pct=Math.round((v.miss/v.tot)*100);
       h+=`<div class="weak-row">
@@ -795,7 +861,7 @@ function renderMisses(){
   }
 
   if(byMiss.length>3){
-    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Tracked</div>`;
+    h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
     byMiss.forEach(([id,v])=>{
       const qt=QTYPES.find(q=>q.id===id);
       const pct=Math.round((v.miss/v.tot)*100);
@@ -809,8 +875,26 @@ function renderMisses(){
     h+=`</div>`;
   }
 
+  if(tagByMiss.length){
+    const tagTop=tagByMiss.filter(([,v])=>v.miss>0).slice(0,8);
+    if(tagTop.length){
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
+      tagTop.forEach(([id,v])=>{
+        const pct=Math.round((v.miss/v.tot)*100);
+        h+=`<div class="weak-row">
+          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
+          <span class="weak-ct">${v.miss}/${v.tot}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+  }
+
+  const editing=editingIdx!=null?S.misses[editingIdx]:null;
   h+=`<div class="card">
-    <div class="sec-title">Log Question</div>
+    <div class="sec-title">${editing?'Edit Entry':'Log Question'}</div>
     <div class="form2">
       <div class="fg"><label>Section</label>
         <select id="m-section" onchange="refreshMissTypes()">
@@ -825,10 +909,21 @@ function renderMisses(){
       </div>
     </div>
     <div class="fg"><label>Question Type</label><select id="m-type"></select></div>
-    <div class="fg"><label>Note (why missed / pattern)</label>
-      <input type="text" id="m-note" placeholder="e.g. Confused necessary vs sufficient on chain ending">
+    <div class="fg" id="m-tags-wrap">
+      <label>Stimulus Tags <span style="color:var(--faint);font-weight:normal">(skills / structure — multi)</span></label>
+      <div class="chip-row" id="m-tags"></div>
     </div>
-    <button class="btn btn-primary" onclick="logMiss()">Log</button>
+    <div class="fg"><label>Ref <span style="color:var(--faint);font-weight:normal">(optional)</span></label>
+      <input type="text" id="m-ref" placeholder="e.g. PT117.S2.Q8" style="font-family:'DM Mono',monospace;font-size:12px" value="${esc(editing?.ref||'')}">
+    </div>
+    <div class="fg"><label>Trap I picked</label>
+      <input type="text" id="m-trap" placeholder="Why the wrong answer pulled me" value="${esc(editing?.trap||'')}">
+    </div>
+    <div class="fg"><label>Lesson / takeaway</label>
+      <input type="text" id="m-note" placeholder="What I'd tell myself next time" value="${esc(editing?.note||'')}">
+    </div>
+    <button class="btn btn-primary" onclick="logMiss()">${editing?'Update':'Log'}</button>
+    ${editing?`<button class="btn btn-secondary" style="margin-left:8px" onclick="cancelEdit()">Cancel</button>`:''}
   </div>`;
 
   if(log.length){
@@ -838,38 +933,87 @@ function renderMisses(){
       const orig=log.length-1-i;
       const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
       const tc=m.correct?'var(--green)':'var(--red)';
+      const tagChips=(m.tags||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
       h+=`<div class="miss-item">
         <span class="miss-badge" style="background:${bg};color:${tc}">${m.correct?'✓':'✗'} ${qtLabel(m.type)}</span>
-        <div style="flex:1">
+        <div style="flex:1;min-width:0">
+          ${m.ref?`<div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--purple);margin-bottom:2px">${esc(m.ref)}</div>`:''}
+          ${tagChips?`<div class="chip-row">${tagChips}</div>`:''}
+          ${m.trap?`<div style="font-size:12px;color:var(--muted);margin-bottom:2px"><span style="color:var(--faint)">trap:</span> ${esc(m.trap)}</div>`:''}
           ${m.note?`<div style="font-size:12px;margin-bottom:2px">${esc(m.note)}</div>`:''}
           <div class="miss-meta">${m.section} · ${new Date(m.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
         </div>
-        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delMiss(${orig})">×</button>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0 4px;line-height:1" onclick="editMiss(${orig})" title="Edit">✎</button>
+        <button style="background:none;border:none;color:var(--faint);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" onclick="delMiss(${orig})" title="Delete">×</button>
       </div>`;
     });
     h+=`</div>`;
   }
 
   el.innerHTML=h;
+  if(editing){
+    document.getElementById('m-section').value=editing.section;
+    document.getElementById('m-correct').value=editing.correct?'1':'0';
+  }
   refreshMissTypes();
+  if(editing) document.getElementById('m-type').value=editing.type;
+  refreshMissTags(editing?.tags||[]);
 }
+
+let editingIdx=null;
 
 function refreshMissTypes(){
   const s=document.getElementById('m-section')?.value;
   const sel=document.getElementById('m-type');
   if(!sel) return;
   sel.innerHTML=QTYPES.filter(q=>q.s===s).map(q=>`<option value="${q.id}">${q.label}</option>`).join('');
+  refreshMissTags(getSelectedTags());
+}
+function refreshMissTags(selected){
+  const s=document.getElementById('m-section')?.value;
+  const wrap=document.getElementById('m-tags-wrap');
+  const row=document.getElementById('m-tags');
+  if(!row||!wrap) return;
+  const avail=STIMULUS_TAGS.filter(t=>t.s===s);
+  if(!avail.length){ wrap.style.display='none'; row.innerHTML=''; return; }
+  wrap.style.display='';
+  const sel=new Set(selected||[]);
+  row.innerHTML=avail.map(t=>`<span class="chip${sel.has(t.id)?' active':''}" data-tag="${t.id}" onclick="toggleTag('${t.id}')">${t.label}</span>`).join('');
+}
+function toggleTag(id){
+  const el=document.querySelector(`#m-tags .chip[data-tag="${id}"]`);
+  if(el) el.classList.toggle('active');
+}
+function getSelectedTags(){
+  return Array.from(document.querySelectorAll('#m-tags .chip.active')).map(c=>c.dataset.tag);
 }
 function logMiss(){
   const section=document.getElementById('m-section').value;
   const type=document.getElementById('m-type').value;
   const correct=document.getElementById('m-correct').value==='1';
+  const tags=getSelectedTags();
+  const ref=(document.getElementById('m-ref').value||'').trim();
+  const trap=(document.getElementById('m-trap').value||'').trim();
   const note=(document.getElementById('m-note').value||'').trim();
-  S.misses.push({ts:Date.now(),section,type,correct,note});
-  document.getElementById('m-note').value='';
+  if(editingIdx!=null){
+    const orig=S.misses[editingIdx];
+    S.misses[editingIdx]={...orig,section,type,tags,correct,ref,trap,note};
+    editingIdx=null;
+  } else {
+    S.misses.push({ts:Date.now(),section,type,tags,correct,ref,trap,note});
+  }
   persist(); renderMisses();
 }
+function editMiss(idx){
+  editingIdx=idx; renderMisses();
+  document.getElementById('misses')?.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cancelEdit(){
+  editingIdx=null; renderMisses();
+}
 function delMiss(idx){
+  if(editingIdx===idx) editingIdx=null;
+  else if(editingIdx!=null && idx<editingIdx) editingIdx--;
   S.misses.splice(idx,1); persist(); renderMisses();
 }
 
