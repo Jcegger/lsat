@@ -820,6 +820,11 @@ const STIMULUS_TAGS = [
   // Sub-tags 7sage uses inside drill tagging
   {id:'suffvnec', label:'SuffvNec',        s:'LR'},
   {id:'factors',  label:'Factors',         s:'LR'},
+  // RC — passage types
+  {id:'rc-law',   label:'Law',             s:'RC'},
+  {id:'rc-sci',   label:'Science',         s:'RC'},
+  {id:'rc-div',   label:'Diversity',       s:'RC'},
+  {id:'rc-comp',  label:'Comparative',     s:'RC'},
 ];
 function tagLabel(id){ return STIMULUS_TAGS.find(t=>t.id===id)?.label||id; }
 
@@ -865,7 +870,7 @@ function renderPractice(){
         <input type="date" id="s-date" value="${editingS?.date||tod()}">
       </div>
       <div class="fg"><label>Section</label>
-        <select id="s-section">
+        <select id="s-section" onchange="refreshSessionTopics()">
           <option value="LR"${(!editingS||editingS.section==='LR')?' selected':''}>LR</option>
           <option value="RC"${editingS?.section==='RC'?' selected':''}>RC</option>
           <option value="Mixed"${editingS?.section==='Mixed'?' selected':''}>Mixed</option>
@@ -1072,7 +1077,7 @@ function renderPractice(){
   refreshMissTypes();
   if(editing) document.getElementById('m-type').value=editing.type;
   refreshMissTags(editing?.tags||[]);
-  fillChipRow('s-topics', STIMULUS_TAGS, editingS?.topics||[]);
+  refreshSessionTopics(editingS?.topics||[]);
   refreshMissFields();
 }
 
@@ -1122,6 +1127,11 @@ function chipsSelected(rowId){
   return Array.from(document.querySelectorAll(`#${rowId} .chip.active`)).map(c=>c.dataset.tag);
 }
 
+function refreshSessionTopics(selected){
+  const s=document.getElementById('s-section')?.value||'LR';
+  const tags=s==='Mixed'?STIMULUS_TAGS:STIMULUS_TAGS.filter(t=>t.s===s);
+  fillChipRow('s-topics', tags, selected||chipsSelected('s-topics'));
+}
 function refreshMissFields(){
   const isCorrect=document.getElementById('m-correct')?.value==='1';
   const trapWrap=document.getElementById('m-trap-wrap');
