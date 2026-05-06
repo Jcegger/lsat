@@ -865,12 +865,21 @@ function renderPractice(){
       <div class="fg"><label>Date</label>
         <input type="date" id="s-date" value="${editingS?.date||tod()}">
       </div>
+      <div class="fg"><label>Section</label>
+        <select id="s-section">
+          <option value="LR"${(!editingS||editingS.section==='LR')?' selected':''}>LR</option>
+          <option value="RC"${editingS?.section==='RC'?' selected':''}>RC</option>
+          <option value="Mixed"${editingS?.section==='Mixed'?' selected':''}>Mixed</option>
+        </select>
+      </div>
+    </div>
+    <div class="form2">
       <div class="fg"><label>Total</label>
         <input type="number" id="s-total" min="1" max="200" value="${editingS?.total??20}">
       </div>
-    </div>
-    <div class="fg"><label>Correct</label>
-      <input type="number" id="s-correct" min="0" max="200" value="${editingS?.correct??''}">
+      <div class="fg"><label>Correct</label>
+        <input type="number" id="s-correct" min="0" max="200" value="${editingS?.correct??''}">
+      </div>
     </div>
     <div class="fg">
       <label>Topics <span style="color:var(--faint);font-weight:normal">(stimulus tags drilled — multi)</span></label>
@@ -1015,10 +1024,11 @@ function renderPractice(){
         const origIdx=S.sessions.indexOf(s);
         const pct=s.total?Math.round(s.correct/s.total*100):0;
         const chips=(s.topics||[]).map(t=>`<span class="chip readonly">${tagLabel(t)}</span>`).join('');
+        const secLabel=s.section||'LR';
         h+=`<div class="miss-item">
           <span class="miss-badge" style="background:var(--purple-lt);color:var(--purple)">${s.correct}/${s.total} · ${pct}%</span>
           <div style="flex:1;min-width:0">
-            ${chips?`<div class="chip-row">${chips}</div>`:''}
+            <div class="chip-row"><span class="chip readonly" style="background:var(--blue-lt,#dbeafe);color:var(--blue,#1d4ed8)">${secLabel}</span>${chips}</div>
             ${s.note?`<div style="font-size:12px;margin-bottom:2px">${esc(s.note)}</div>`:''}
             <div class="miss-meta">${fmtDate(s.date)}</div>
           </div>
@@ -1070,6 +1080,7 @@ let editingSessionIdx=null;
 
 function logSession(){
   const date=document.getElementById('s-date').value||tod();
+  const section=document.getElementById('s-section').value||'LR';
   const totalRaw=document.getElementById('s-total').value;
   const correctRaw=document.getElementById('s-correct').value;
   if(totalRaw===''||correctRaw==='') return;
@@ -1079,10 +1090,10 @@ function logSession(){
   if(!total||correct<0||correct>total) return;
   if(editingSessionIdx!=null){
     const orig=S.sessions[editingSessionIdx];
-    S.sessions[editingSessionIdx]={...orig,date,topics,total,correct,note};
+    S.sessions[editingSessionIdx]={...orig,date,section,topics,total,correct,note};
     editingSessionIdx=null;
   } else {
-    S.sessions.push({ts:Date.now(),date,topics,total,correct,note});
+    S.sessions.push({ts:Date.now(),date,section,topics,total,correct,note});
   }
   persist(); renderPractice();
 }
