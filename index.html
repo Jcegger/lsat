@@ -836,23 +836,25 @@ function renderPractice(){
   const agg={};
   log.forEach(m=>{
     if(!m.type) return;
-    if(!agg[m.type]) agg[m.type]={tot:0,cor:0};
+    if(!agg[m.type]) agg[m.type]={tot:0,miss:0};
     agg[m.type].tot++;
-    if(m.correct) agg[m.type].cor++;
+    if(!m.correct) agg[m.type].miss++;
   });
-  const byAcc=Object.entries(agg).filter(([,v])=>v.tot>0).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
-  const top3=byAcc.slice(0,3);
+  const byMiss=Object.entries(agg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
+  const maxM=Math.max(1,...byMiss.map(([,v])=>v.miss));
+  const top3=byMiss.filter(([,v])=>v.miss>0).slice(0,3);
 
   // Aggregate by stimulus tag
   const tagAgg={};
   log.forEach(m=>{
     (m.tags||[]).forEach(t=>{
-      if(!tagAgg[t]) tagAgg[t]={tot:0,cor:0};
+      if(!tagAgg[t]) tagAgg[t]={tot:0,miss:0};
       tagAgg[t].tot++;
-      if(m.correct) tagAgg[t].cor++;
+      if(!m.correct) tagAgg[t].miss++;
     });
   });
-  const tagByAcc=Object.entries(tagAgg).filter(([,v])=>v.tot>0).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
+  const tagByMiss=Object.entries(tagAgg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
+  const tagMaxM=Math.max(1,...tagByMiss.map(([,v])=>v.miss));
 
   let h='';
 
@@ -930,7 +932,7 @@ function renderPractice(){
   </div>`;
 
   // ── Zone: ANALYTICS ─────────────────────────────────────────
-  const hasAnalytics=S.sessions.length||top3.length||tagByAcc.length||byAcc.length>3;
+  const hasAnalytics=S.sessions.length||top3.length||tagByMiss.length||byMiss.length>3;
   if(hasAnalytics){
     h+=`<div class="zone-hdr">Analytics</div>`;
 
@@ -969,48 +971,47 @@ function renderPractice(){
     }
 
     if(top3.length){
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Weakest Types</div>`;
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
       top3.forEach(([id,v],i)=>{
-        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
-        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        const pct=Math.round((v.miss/v.tot)*100);
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
           <span class="weak-name">${qtLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
-          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
+          <span class="weak-ct">${v.miss} miss</span>
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
         </div>`;
       });
       h+=`</div>`;
     }
 
-    if(tagByAcc.length){
-      const tagTop=tagByAcc.slice(0,8);
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Weakest Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
-      tagTop.forEach(([id,v])=>{
-        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
-        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
-        h+=`<div class="weak-row">
-          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
-          <span class="weak-ct">${v.cor}/${v.tot}</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-        </div>`;
-      });
-      h+=`</div>`;
+    if(tagByMiss.length){
+      const tagTop=tagByMiss.filter(([,v])=>v.miss>0).slice(0,8);
+      if(tagTop.length){
+        h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
+        tagTop.forEach(([id,v])=>{
+          const pct=Math.round((v.miss/v.tot)*100);
+          h+=`<div class="weak-row">
+            <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+            <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
+            <span class="weak-ct">${v.miss}/${v.tot}</span>
+            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+          </div>`;
+        });
+        h+=`</div>`;
+      }
     }
 
-    if(byAcc.length>3){
+    if(byMiss.length>3){
       h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
-      byAcc.forEach(([id,v])=>{
+      byMiss.forEach(([id,v])=>{
         const qt=QTYPES.find(q=>q.id===id);
-        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
-        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        const pct=Math.round((v.miss/v.tot)*100);
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
           <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
-          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
+          <span class="weak-ct">${v.miss}/${v.tot}</span>
         </div>`;
       });
       h+=`</div>`;
@@ -1046,7 +1047,7 @@ function renderPractice(){
 
     if(log.length){
       const recent=log.slice().reverse().slice(0,25);
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Entries</div>`;
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Misses</div>`;
       recent.forEach((m,i)=>{
         const orig=log.length-1-i;
         const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
