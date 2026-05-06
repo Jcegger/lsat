@@ -938,34 +938,50 @@ function renderPractice(){
 
     if(S.sessions.length){
       const topicAgg={};
+      const mixedAgg={};
       let totalQ=0,totalC=0;
       S.sessions.forEach(s=>{
         totalQ+=+s.total||0; totalC+=+s.correct||0;
-        (s.topics||[]).forEach(t=>{
-          if(!topicAgg[t]) topicAgg[t]={tot:0,cor:0,sess:0};
+        const topics=s.topics||[];
+        if(topics.length===1){
+          const t=topics[0];
+          if(!topicAgg[t]) topicAgg[t]={tot:0,cor:0};
           topicAgg[t].tot+=+s.total||0;
           topicAgg[t].cor+=+s.correct||0;
-          topicAgg[t].sess++;
-        });
+        } else {
+          const key=s.section||'LR';
+          if(!mixedAgg[key]) mixedAgg[key]={tot:0,cor:0};
+          mixedAgg[key].tot+=+s.total||0;
+          mixedAgg[key].cor+=+s.correct||0;
+        }
       });
       const topics=Object.entries(topicAgg).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
+      const mixed=Object.entries(mixedAgg).sort((a,b)=>a[0].localeCompare(b[0]));
       const overallPct=totalQ?Math.round(totalC/totalQ*100):0;
       h+=`<div class="card card-sm" style="margin-bottom:10px">
         <div class="sec-title">Drill Accuracy <span style="color:var(--faint);text-transform:none;letter-spacing:0">· ${totalC}/${totalQ} (${overallPct}%) across ${S.sessions.length} session${S.sessions.length===1?'':'s'}</span></div>`;
-      if(topics.length){
-        topics.forEach(([id,v])=>{
-          const pct=v.tot?Math.round(v.cor/v.tot*100):0;
-          const barW=Math.max(2,pct);
-          const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
-          h+=`<div class="weak-row">
-            <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
-            <div class="weak-bar-bg"><div class="weak-bar" style="width:${barW}%;background:${barColor}"></div></div>
-            <span class="weak-ct">${v.cor}/${v.tot}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-          </div>`;
-        });
-      } else {
-        h+=`<div style="font-size:12px;color:var(--faint);padding:4px 0">No topic-tagged sessions yet.</div>`;
+      topics.forEach(([id,v])=>{
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        h+=`<div class="weak-row">
+          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+      mixed.forEach(([sec,v])=>{
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        h+=`<div class="weak-row">
+          <span class="weak-name" style="min-width:90px;color:var(--muted)">${sec} · mixed</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+      if(!topics.length&&!mixed.length){
+        h+=`<div style="font-size:12px;color:var(--faint);padding:4px 0">No sessions yet.</div>`;
       }
       h+=`</div>`;
     }
