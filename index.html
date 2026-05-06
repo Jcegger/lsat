@@ -949,7 +949,9 @@ function renderPractice(){
           topicAgg[t].tot+=+s.total||0;
           topicAgg[t].cor+=+s.correct||0;
         } else {
-          const key=s.section||'LR';
+          const key=topics.length
+            ? topics.map(t=>tagLabel(t)).join(' · ')
+            : (s.section||'LR')+' · mixed';
           if(!mixedAgg[key]) mixedAgg[key]={tot:0,cor:0};
           mixedAgg[key].tot+=+s.total||0;
           mixedAgg[key].cor+=+s.correct||0;
