@@ -830,25 +830,23 @@ function renderPractice(){
   const agg={};
   log.forEach(m=>{
     if(!m.type) return;
-    if(!agg[m.type]) agg[m.type]={tot:0,miss:0};
+    if(!agg[m.type]) agg[m.type]={tot:0,cor:0};
     agg[m.type].tot++;
-    if(!m.correct) agg[m.type].miss++;
+    if(m.correct) agg[m.type].cor++;
   });
-  const byMiss=Object.entries(agg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
-  const maxM=Math.max(1,...byMiss.map(([,v])=>v.miss));
-  const top3=byMiss.filter(([,v])=>v.miss>0).slice(0,3);
+  const byAcc=Object.entries(agg).filter(([,v])=>v.tot>0).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
+  const top3=byAcc.slice(0,3);
 
   // Aggregate by stimulus tag
   const tagAgg={};
   log.forEach(m=>{
     (m.tags||[]).forEach(t=>{
-      if(!tagAgg[t]) tagAgg[t]={tot:0,miss:0};
+      if(!tagAgg[t]) tagAgg[t]={tot:0,cor:0};
       tagAgg[t].tot++;
-      if(!m.correct) tagAgg[t].miss++;
+      if(m.correct) tagAgg[t].cor++;
     });
   });
-  const tagByMiss=Object.entries(tagAgg).filter(([,v])=>v.tot>0).sort((a,b)=>b[1].miss-a[1].miss);
-  const tagMaxM=Math.max(1,...tagByMiss.map(([,v])=>v.miss));
+  const tagByAcc=Object.entries(tagAgg).filter(([,v])=>v.tot>0).sort((a,b)=>(a[1].cor/a[1].tot)-(b[1].cor/b[1].tot));
 
   let h='';
 
@@ -901,7 +899,7 @@ function renderPractice(){
         </select>
       </div>
       <div class="fg"><label>Result</label>
-        <select id="m-correct">
+        <select id="m-correct" onchange="refreshMissFields()">
           <option value="0">Missed ✗</option>
           <option value="1">Correct ✓</option>
         </select>
@@ -915,10 +913,10 @@ function renderPractice(){
     <div class="fg"><label>Ref <span style="color:var(--faint);font-weight:normal">(optional)</span></label>
       <input type="text" id="m-ref" placeholder="e.g. PT117.S2.Q8" style="font-family:'DM Mono',monospace;font-size:12px" value="${esc(editing?.ref||'')}">
     </div>
-    <div class="fg"><label>Trap I picked</label>
+    <div class="fg" id="m-trap-wrap"><label>Trap I picked</label>
       <input type="text" id="m-trap" placeholder="Why the wrong answer pulled me" value="${esc(editing?.trap||'')}">
     </div>
-    <div class="fg"><label>Lesson / takeaway</label>
+    <div class="fg" id="m-note-wrap"><label>Lesson / takeaway</label>
       <input type="text" id="m-note" placeholder="What I'd tell myself next time" value="${esc(editing?.note||'')}">
     </div>
     <button class="btn btn-primary" onclick="logMiss()">${editing?'Update':'Log'}</button>
@@ -926,7 +924,7 @@ function renderPractice(){
   </div>`;
 
   // ── Zone: ANALYTICS ─────────────────────────────────────────
-  const hasAnalytics=S.sessions.length||top3.length||tagByMiss.length||byMiss.length>3;
+  const hasAnalytics=S.sessions.length||top3.length||tagByAcc.length||byAcc.length>3;
   if(hasAnalytics){
     h+=`<div class="zone-hdr">Analytics</div>`;
 
@@ -965,47 +963,48 @@ function renderPractice(){
     }
 
     if(top3.length){
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Weakest Types</div>`;
       top3.forEach(([id,v],i)=>{
-        const pct=Math.round((v.miss/v.tot)*100);
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
           <span class="weak-name">${qtLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
-          <span class="weak-ct">${v.miss} miss</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
         </div>`;
       });
       h+=`</div>`;
     }
 
-    if(tagByMiss.length){
-      const tagTop=tagByMiss.filter(([,v])=>v.miss>0).slice(0,8);
-      if(tagTop.length){
-        h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
-        tagTop.forEach(([id,v])=>{
-          const pct=Math.round((v.miss/v.tot)*100);
-          h+=`<div class="weak-row">
-            <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
-            <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
-            <span class="weak-ct">${v.miss}/${v.tot}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
-          </div>`;
-        });
-        h+=`</div>`;
-      }
+    if(tagByAcc.length){
+      const tagTop=tagByAcc.slice(0,8);
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Weakest Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
+      tagTop.forEach(([id,v])=>{
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
+        h+=`<div class="weak-row">
+          <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+        </div>`;
+      });
+      h+=`</div>`;
     }
 
-    if(byMiss.length>3){
+    if(byAcc.length>3){
       h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
-      byMiss.forEach(([id,v])=>{
+      byAcc.forEach(([id,v])=>{
         const qt=QTYPES.find(q=>q.id===id);
-        const pct=Math.round((v.miss/v.tot)*100);
+        const pct=v.tot?Math.round(v.cor/v.tot*100):0;
+        const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
           <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
-          <span class="weak-ct">${v.miss}/${v.tot}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
+          <span class="weak-ct">${v.cor}/${v.tot}</span>
         </div>`;
       });
       h+=`</div>`;
@@ -1041,7 +1040,7 @@ function renderPractice(){
 
     if(log.length){
       const recent=log.slice().reverse().slice(0,25);
-      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Misses</div>`;
+      h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Recent Entries</div>`;
       recent.forEach((m,i)=>{
         const orig=log.length-1-i;
         const bg=m.correct?'var(--green-lt)':'var(--red-lt)';
@@ -1073,6 +1072,7 @@ function renderPractice(){
   if(editing) document.getElementById('m-type').value=editing.type;
   refreshMissTags(editing?.tags||[]);
   fillChipRow('s-topics', STIMULUS_TAGS, editingS?.topics||[]);
+  refreshMissFields();
 }
 
 let editingIdx=null;
@@ -1121,6 +1121,21 @@ function chipsSelected(rowId){
   return Array.from(document.querySelectorAll(`#${rowId} .chip.active`)).map(c=>c.dataset.tag);
 }
 
+function refreshMissFields(){
+  const isCorrect=document.getElementById('m-correct')?.value==='1';
+  const trapWrap=document.getElementById('m-trap-wrap');
+  const noteWrap=document.getElementById('m-note-wrap');
+  if(!trapWrap||!noteWrap) return;
+  if(isCorrect){
+    trapWrap.style.display='none';
+    noteWrap.style.display='none';
+    document.getElementById('m-trap').value='';
+    document.getElementById('m-note').value='';
+  } else {
+    trapWrap.style.display='';
+    noteWrap.style.display='';
+  }
+}
 function refreshMissTypes(){
   const s=document.getElementById('m-section')?.value;
   const sel=document.getElementById('m-type');
