@@ -973,13 +973,11 @@ function renderPractice(){
     if(top3.length){
       h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Types</div>`;
       top3.forEach(([id,v],i)=>{
-        const pct=Math.round((v.miss/v.tot)*100);
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);min-width:18px">#${i+1}</span>
           <span class="weak-name">${qtLabel(id)}</span>
           <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%"></div></div>
           <span class="weak-ct">${v.miss} miss</span>
-          <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
         </div>`;
       });
       h+=`</div>`;
@@ -990,12 +988,10 @@ function renderPractice(){
       if(tagTop.length){
         h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">Top Weak Tags <span style="color:var(--faint);text-transform:none;letter-spacing:0">(stimulus / skills)</span></div>`;
         tagTop.forEach(([id,v])=>{
-          const pct=Math.round((v.miss/v.tot)*100);
           h+=`<div class="weak-row">
             <span class="weak-name" style="min-width:90px">${tagLabel(id)}</span>
             <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/tagMaxM)*100}%;background:var(--purple)"></div></div>
-            <span class="weak-ct">${v.miss}/${v.tot}</span>
-            <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
+            <span class="weak-ct">${v.miss} miss</span>
           </div>`;
         });
         h+=`</div>`;
@@ -1006,12 +1002,11 @@ function renderPractice(){
       h+=`<div class="card card-sm" style="margin-bottom:10px"><div class="sec-title">All Types</div>`;
       byMiss.forEach(([id,v])=>{
         const qt=QTYPES.find(q=>q.id===id);
-        const pct=Math.round((v.miss/v.tot)*100);
         h+=`<div class="weak-row">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--faint);min-width:22px">${qt?.s||''}</span>
           <span class="weak-name" style="min-width:150px">${qtLabel(id)}</span>
-          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:${pct>60?'#DC2626':'var(--pink)'}"></div></div>
-          <span class="weak-ct">${v.miss}/${v.tot}</span>
+          <div class="weak-bar-bg"><div class="weak-bar" style="width:${(v.miss/maxM)*100}%;background:var(--pink)"></div></div>
+          <span class="weak-ct">${v.miss} miss</span>
         </div>`;
       });
       h+=`</div>`;
