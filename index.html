@@ -976,7 +976,7 @@ function renderPractice(){
         const pct=v.tot?Math.round(v.cor/v.tot*100):0;
         const barColor=pct<70?'#DC2626':pct<85?'var(--pink)':'var(--green)';
         h+=`<div class="weak-row">
-          <span class="weak-name" style="min-width:90px;color:var(--muted)">${sec} · mixed</span>
+          <span class="weak-name" style="min-width:90px;color:var(--muted)">${sec}</span>
           <div class="weak-bar-bg"><div class="weak-bar" style="width:${Math.max(2,pct)}%;background:${barColor}"></div></div>
           <span class="weak-ct">${v.cor}/${v.tot}</span>
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);min-width:30px;text-align:right">${pct}%</span>
