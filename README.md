@@ -22,13 +22,21 @@ All state is stored in a single Supabase row and synced on every change. localSt
 
 ## Study plan
 
-14 weeks · May 1 – August 8, 2026 · 45 min/day · 6 practice tests
+14 weeks · May 1 – August 8, 2026 · 45–90 min/day · 6 practice tests
 
 | Phase | Weeks | Focus |
 |-------|-------|-------|
-| 1 | 1–4 | RC foundation (PowerScore) + LR rebuild |
-| 2 | 5–9 | Timed sections + full LR reintegration |
+| 1 | 1–4 | RC foundation (PowerScore RC Bible) + LR rebuild + start The Loophole |
+| 2 | 5–9 | Timed sections + full LR reintegration (Loophole method) |
 | 3 | 10–13 | Full test simulation |
 | 4 | 14 | Test week |
 
 Target: **167** (Fordham Law Part-Time Evening median: 165)
+
+## Materials
+
+- **The Loophole** (Ellen Cassidy) — primary LR instruction, read sequentially starting May 9
+- **PowerScore RC Bible** — RC foundation, Weeks 1–4
+- **PowerScore LR Bible** — formal logic reference only (conditional logic depth)
+- **7Sage** — PT drilling, RC passages, analytics
+- See [LOOPHOLE_REFERENCE.md](LOOPHOLE_REFERENCE.md) for chapter → question type lookup
