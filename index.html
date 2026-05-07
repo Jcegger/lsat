@@ -164,21 +164,21 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 // [date, label, task, types[], week]
 const PLAN_RAW = [
 ['2026-05-01','Fri May 1','Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35).',['book'],1],
-['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61).',['book'],1],
+['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61). Then 15 untimed mixed LR on 7Sage. Bring misses to Claude.',['book','lr'],1],
 ['2026-05-03','Sun May 3','Ch 3 second half — Passage Argumentation, Main Point, Passage Structure, Sample Passage Analyzed (pp.79–114). Do the Basic Summary and Purpose Drill (p.93).',['book'],1],
 ['2026-05-04','Mon May 4','Ch 4: Passage Elements & Formations — recognition drill (p.141). Then 20 untimed CondR on 7Sage — multi-link chains only. Bring misses to Claude.',['book','condr'],1],
 ['2026-05-05','Tue May 5','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach.',['book'],1],
 ['2026-05-06','Wed May 6','20 untimed mixed LR (all types). Let 7Sage analytics surface what\'s slipping. Bring misses to Claude.',['lr'],1],
 ['2026-05-07','Thu May 7','Rest.',['rest'],1],
 ['2026-05-08','Fri May 8','Ch 6 pt 1 (pp.179–200): question stems, location element, types overview. Do Location Designation Drill (p.183).',['book'],2],
-['2026-05-09','Sat May 9','Ch 6 pt 2 (pp.201–246): Must Be True, Strengthen, Weaken, all subtypes. Do Identify the Question Stem Drill (p.191).',['book'],2],
+['2026-05-09','Sat May 9','Ch 6 pt 2 (pp.201–246): Must Be True, Strengthen, Weaken, all subtypes. Do Identify the Question Stem Drill (p.191). Then 15 untimed mixed LR — focus on question types from today\'s reading.',['book','lr'],2],
 ['2026-05-10','Sun May 10','2 untimed 7Sage RC passages. Apply question type recognition from Ch 6. Bring misses to Claude.',['rc'],2],
 ['2026-05-11','Mon May 11','20 untimed CondR — Inverse Fallacy and contrapositive chains. Bring misses to Claude.',['condr'],2],
 ['2026-05-12','Tue May 12','Ch 7: Putting It All Together (pp.249–289). Do both practice passages (PT 122 + PT 121).',['book'],2],
 ['2026-05-13','Wed May 13','20 untimed mixed LR. Are the same question types slipping week over week? Bring to Claude.',['lr'],2],
 ['2026-05-14','Thu May 14','Rest.',['rest'],2],
 ['2026-05-15','Fri May 15','Ch 8: Comparative Reading (pp.291–329). Do both comparative practice passages.',['book'],3],
-['2026-05-16','Sat May 16','Ch 9 pt 1 (pp.331–373): Diversity + Law passages. Do diversity practice (p.348) and law practice (p.365).',['book'],3],
+['2026-05-16','Sat May 16','Ch 9 pt 1 (pp.331–373): Diversity + Law passages. Do diversity practice (p.348) and law practice (p.365). Then 15 untimed mixed LR.',['book','lr'],3],
 ['2026-05-17','Sun May 17','Ch 9 pt 2 (pp.375–399): Science passages. Do science practice (p.389). Then 1 untimed 7Sage science passage.',['book','rc'],3],
 ['2026-05-18','Mon May 18','20 untimed CondR — CausR traps (correlation, reverse causation, alternative cause, confounding variable). Bring misses to Claude.',['condr'],3],
 ['2026-05-19','Tue May 19','3 untimed 7Sage RC passages — mix of all passage types. Passage map required for each.',['rc'],3],
@@ -194,13 +194,13 @@ const PLAN_RAW = [
 ['2026-05-29','Fri May 29','2 untimed 7Sage RC passages. Focus on weakest passage type from Week 3. Passage map required for each.',['rc'],5],
 ['2026-05-30','Sat May 30','Review RC misses from Friday. Bring to Claude.',['review'],5],
 ['2026-05-31','Sun May 31','Practice Test #1 — full timed PT. Home, ethernet, phone off. First real benchmark.',['pt'],5],
-['2026-06-01','Mon Jun 1','PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude. Decision gate: if 5+ LR misses cluster in 2–3 question types, pull those LR Bible chapters for Jun 7–13. If LR is broadly solid, skip LR Bible and add RC sessions instead.',['review'],5],
+['2026-06-01','Mon Jun 1','PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude. Plan for LR Bible targeted chapters in week 6 (Jun 7–13) by default. Only substitute RC sessions if LR accuracy was above 80% on PT #1.',['review'],5],
 ['2026-06-02','Tue Jun 2','Targeted drilling on PT #1 weak areas. Claude will direct.',['review'],5],
 ['2026-06-03','Wed Jun 3','20 untimed mixed LR.',['lr'],5],
 ['2026-06-04','Thu Jun 4','Rest.',['rest'],5],
 ['2026-06-05','Fri Jun 5','Timed RC section. Try to finish with 2 min to spare — skip and return if stuck.',['rc'],6],
-['2026-06-06','Sat Jun 6','25 untimed mixed LR. Target 90%+ accuracy. Bring misses to Claude.',['lr'],6],
-['2026-06-07','Sun Jun 7','Targeted LR drilling — PT #1 weak question types. If LR was solid on PT #1, do timed RC section instead.',['lr'],6],
+['2026-06-06','Sat Jun 6','Back-to-back timed sections: LR then RC with 10-min break. Bring misses to Claude.',['lr','rc'],6],
+['2026-06-07','Sun Jun 7','LR Bible targeted chapters — focus on PT #1 weak question types. If LR >80% on PT #1, do timed RC section instead.',['lr'],6],
 ['2026-06-08','Mon Jun 8','20 untimed RC passages — apply VIEWSTAMP mapping. Focus on passage types that bled on PT #1.',['rc'],6],
 ['2026-06-09','Tue Jun 9','Timed LR section. Track every question over 90 sec. Bring to Claude.',['lr'],6],
 ['2026-06-10','Wed Jun 10','Timed LR section. Track anything over 90 sec.',['lr'],6],
@@ -213,14 +213,14 @@ const PLAN_RAW = [
 ['2026-06-17','Wed Jun 17','Review week\'s RC misses. Comprehension or question-type errors? Bring to Claude.',['review'],7],
 ['2026-06-18','Thu Jun 18','Rest.',['rest'],7],
 ['2026-06-19','Fri Jun 19','PowerScore RC Passage ReChallenge (p.435) — redo book passages timed. Review misses immediately after.',['book','rc'],8],
-['2026-06-20','Sat Jun 20','Timed LR section.',['lr'],8],
+['2026-06-20','Sat Jun 20','Back-to-back timed sections: LR then RC with 10-min break.',['lr','rc'],8],
 ['2026-06-21','Sun Jun 21','Timed RC section. Aim to finish with time to check answers.',['rc'],8],
-['2026-06-22','Mon Jun 22','Back-to-back: LR then RC with 10-min break. Stamina work.',['lr','rc'],8],
+['2026-06-22','Mon Jun 22','25 untimed LR — persistent weak question types from PT #2. Bring to Claude.',['lr'],8],
 ['2026-06-23','Tue Jun 23','25 untimed LR — persistent weak types only.',['lr'],8],
 ['2026-06-24','Wed Jun 24','Light mixed LR — 15 questions, untimed, confidence only.',['lr'],8],
 ['2026-06-25','Thu Jun 25','Rest.',['rest'],8],
-['2026-06-26','Fri Jun 26','Back-to-back timed sections: RC then LR with 10-min break. Build multi-section stamina.',['rc','lr'],9],
-['2026-06-27','Sat Jun 27','Back-to-back: LR then RC. Final stamina check before PT #3.',['lr','rc'],9],
+['2026-06-26','Fri Jun 26','Timed RC section.',['rc'],9],
+['2026-06-27','Sat Jun 27','Light review of PT #2 miss patterns. Rest. PT #3 tomorrow.',['review'],9],
 ['2026-06-28','Sun Jun 28','Practice Test #3 — full timed PT. Midpoint benchmark.',['pt'],9],
 ['2026-06-29','Mon Jun 29','PT #3 full review — bring to Claude. Are we trending toward 162?',['review'],9],
 ['2026-06-30','Tue Jun 30','Targeted drilling on PT #3 misses.',['review'],9],
@@ -390,7 +390,7 @@ const CAL_WK_LABEL={
   '2026-06-01':'PT #1 review + targeted drilling (PT #2 Jun 14)',
   '2026-06-08':'PT #2 prep drilling + PT #2 (Jun 14)',
   '2026-06-15':'PT #2 review + RC ReChallenge + stamina',
-  '2026-06-22':'PT #3 prep stamina + PT #3 (Jun 28)',
+  '2026-06-22':'LR drilling + Sat stamina + PT #3 (Jun 28)',
   '2026-06-29':'PT #3 review + drilling + PT #4 (Jul 5)',
   '2026-07-06':'PT #4 review + PT #5',
   '2026-07-13':'PT #5 review + PT #6 final',
@@ -463,11 +463,22 @@ function getTimeEst(d){
   if(d.types.includes('rest')) return '';
   if(d.types.includes('pt')) return '2.5 hrs';
   if(d.types.includes('review')&&d.task.toLowerCase().startsWith('pt #')) return '90 min';
-  if(d.date==='2026-05-22') return '45 min — optional if traveling';
-  if(d.date==='2026-05-02') return '45 min';
-  if(d.date==='2026-05-04') return '75 min';
-  const dow=new Date(d.date+'T00:00:00').getDay();
-  return(dow===0||dow===6)?'75 min':'45 min';
+  const overrides={
+    '2026-05-02':'75 min',
+    '2026-05-04':'75 min',
+    '2026-05-17':'60 min',
+    '2026-05-22':'45 min — optional if traveling',
+    '2026-06-13':'30 min',
+    '2026-07-31':'20 min',
+    '2026-08-01':'20 min',
+    '2026-08-02':'20 min',
+  };
+  if(overrides[d.date]) return overrides[d.date];
+  const t=d.task.toLowerCase();
+  if(t.includes('back-to-back')) return '90 min';
+  if(t.startsWith('timed ')) return '60 min';
+  if(d.types.length===1&&d.types[0]==='book') return '60 min';
+  return '45 min';
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────────────
