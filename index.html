@@ -164,7 +164,7 @@ svg.ptchart{width:100%;height:100%;overflow:visible}
 // [date, label, task, types[], week]
 const PLAN_RAW = [
 ['2026-05-01','Fri May 1','Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35).',['book'],1],
-['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61). Then 15 untimed mixed LR on 7Sage. Bring misses to Claude.',['book','lr'],1],
+['2026-05-02','Sat May 2','Ch 3 first half — What to Read For, VIEWSTAMP intro, Viewpoint Identification (pp.47–79). Do the Viewpoint and Attitude Identification Drill (p.61).',['book'],1],
 ['2026-05-03','Sun May 3','Ch 3 second half — Passage Argumentation, Main Point, Passage Structure, Sample Passage Analyzed (pp.79–114). Do the Basic Summary and Purpose Drill (p.93).',['book'],1],
 ['2026-05-04','Mon May 4','Ch 4: Passage Elements & Formations — recognition drill (p.141). Then 20 untimed CondR on 7Sage — multi-link chains only. Bring misses to Claude.',['book','condr'],1],
 ['2026-05-05','Tue May 5','Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach.',['book'],1],
@@ -464,8 +464,9 @@ function getTimeEst(d){
   if(d.types.includes('pt')) return '2.5 hrs';
   if(d.types.includes('review')&&d.task.toLowerCase().startsWith('pt #')) return '90 min';
   const overrides={
-    '2026-05-02':'75 min',
     '2026-05-04':'75 min',
+    '2026-05-09':'75 min',
+    '2026-05-16':'75 min',
     '2026-05-17':'60 min',
     '2026-05-22':'45 min — optional if traveling',
     '2026-06-13':'30 min',
