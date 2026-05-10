@@ -844,7 +844,7 @@ const STIMULUS_TAGS = [
   {id:'rc-div',   label:'Diversity',       s:'RC'},
   {id:'rc-comp',  label:'Comparative',     s:'RC'},
 ];
-function tagLabel(id){ return STIMULUS_TAGS.find(t=>t.id===id)?.label||id; }
+function tagLabel(id){ return QTYPES.find(t=>t.id===id)?.label||STIMULUS_TAGS.find(t=>t.id===id)?.label||id; }
 
 function renderPractice(){
   const el=document.getElementById('practice');
@@ -1161,8 +1161,9 @@ function chipsSelected(rowId){
 
 function refreshSessionTopics(selected){
   const s=document.getElementById('s-section')?.value||'LR';
-  const tags=s==='Mixed'?STIMULUS_TAGS:STIMULUS_TAGS.filter(t=>t.s===s);
-  fillChipRow('s-topics', tags, selected||chipsSelected('s-topics'));
+  const stim=s==='Mixed'?STIMULUS_TAGS:STIMULUS_TAGS.filter(t=>t.s===s);
+  const qt=s==='Mixed'?QTYPES:QTYPES.filter(t=>t.s===s);
+  fillChipRow('s-topics', [...qt, ...stim], selected||chipsSelected('s-topics'));
 }
 function refreshMissFields(){
   const isCorrect=document.getElementById('m-correct')?.value==='1';
