@@ -768,31 +768,34 @@ function delPT(num){
 
 // ── MISS TRACKER ───────────────────────────────────────────────────────────
 // Question types — single per question. Mirrors 7sage's official taxonomy
-// (17 LR, 13 RC). https://7sage.com/lr-question-types · /rc-question-types
+// (20 LR, 13 RC). https://7sage.com/lr-question-types · /rc-question-types
 const QTYPES = [
   // LR — Argument structure
-  {id:'mc',       label:'Main Conclusion',           s:'LR'},
-  {id:'argpart',  label:'Argument Part',             s:'LR'},
-  {id:'mor',      label:'Method of Reasoning',       s:'LR'},
+  {id:'mc',        label:'Main Conclusion',              s:'LR'},
+  {id:'argpart',   label:'Argument Part',                s:'LR'},
+  {id:'mor',       label:'Method of Reasoning',          s:'LR'},
   // LR — Assumptions / flaws
-  {id:'flaw',     label:'Flaw',                      s:'LR'},
-  {id:'na',       label:'Necessary Assumption',      s:'LR'},
-  {id:'sa',       label:'Sufficient Assumption',     s:'LR'},
-  {id:'streng',   label:'Strengthen',                s:'LR'},
-  {id:'weak',     label:'Weaken',                    s:'LR'},
-  {id:'eval',     label:'Evaluate',                  s:'LR'},
+  {id:'flaw',      label:'Flaw',                         s:'LR'},
+  {id:'na',        label:'Necessary Assumption',         s:'LR'},
+  {id:'sa',        label:'Sufficient Assumption',        s:'LR'},
+  {id:'streng',    label:'Strengthen',                   s:'LR'},
+  {id:'weak',      label:'Weaken',                       s:'LR'},
+  {id:'eval',      label:'Evaluate',                     s:'LR'},
   // LR — Inferences
-  {id:'mbt',      label:'Must Be True',              s:'LR'},
-  {id:'mss',      label:'Most Strongly Supported',   s:'LR'},
+  {id:'mbt',       label:'Must Be True',                 s:'LR'},
+  {id:'mbf',       label:'Must Be False',                s:'LR'},
+  {id:'mss',       label:'Most Strongly Supported',      s:'LR'},
+  {id:'inference', label:'Inference',                    s:'LR'},
   // LR — Principles
-  {id:'psa',      label:'PSA: Find the Rule',        s:'LR'},
-  {id:'psaa',     label:'PSA: Apply the Rule',       s:'LR'},
+  {id:'psa',       label:'PSA: Find the Rule',           s:'LR'},
+  {id:'psaa',      label:'PSA: Apply the Rule',          s:'LR'},
   // LR — Parallel
-  {id:'para',     label:'Parallel MoR',              s:'LR'},
-  {id:'pf',       label:'Parallel Flaw',             s:'LR'},
+  {id:'para',      label:'Parallel MoR',                 s:'LR'},
+  {id:'pf',        label:'Parallel Flaw',                s:'LR'},
   // LR — Other
-  {id:'rre',      label:'Resolve / Reconcile / Explain', s:'LR'},
-  {id:'pai',      label:'Point at Issue',            s:'LR'},
+  {id:'rre',       label:'Resolve / Reconcile / Explain',s:'LR'},
+  {id:'pai',       label:'Point at Issue: Disagree',     s:'LR'},
+  {id:'pai-a',     label:'Point at Issue: Agree',        s:'LR'},
   // RC — Overall structure
   {id:'rc-mp',    label:'Main Point',                s:'RC'},
   {id:'rc-pp',    label:'Purpose of Passage',        s:'RC'},
