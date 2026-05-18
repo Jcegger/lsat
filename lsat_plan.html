@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jay's LSAT Plan — Aug 8 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #F7F6F2; color: #1a1a1a; padding: 2rem 1rem; min-height: 100vh; }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #888; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 22px; font-weight: 600; color: #1a1a1a; margin-bottom: 2rem; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
+  .stat { background: white; border: 1px solid #E8E6E0; border-radius: 10px; padding: 14px; text-align: center; }
+  .stat-num { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: #1a1a1a; }
+  .stat-label { font-size: 11px; color: #999; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; align-items: center; font-size: 12px; color: #888; }
+  .tag { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.03em; display: inline-block; vertical-align: middle; margin-left: 5px; }
+  .tag-book   { background: #EDE9FE; color: #5B21B6; }
+  .tag-rc     { background: #DBEAFE; color: #1D4ED8; }
+  .tag-lr     { background: #DCFCE7; color: #166534; }
+  .tag-condr  { background: #FEF9C3; color: #713F12; }
+  .tag-pt     { background: #FEF3C7; color: #92400E; }
+  .tag-review { background: #FCE7F3; color: #9D174D; }
+  .tag-rest   { background: #F1F0EC; color: #666; }
+  .phase-label { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: #999; margin: 2rem 0 0.4rem; padding-left: 2px; }
+  .phase-note { font-size: 12px; color: #bbb; margin-bottom: 0.75rem; padding-left: 2px; }
+  .week { background: white; border: 1px solid #E8E6E0; border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+  .week-header { display: flex; align-items: center; gap: 12px; padding: 13px 16px; cursor: pointer; user-select: none; transition: background 0.15s; }
+  .week-header:hover { background: #FAFAF8; }
+  .week-num { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #bbb; min-width: 52px; letter-spacing: 0.04em; }
+  .week-title { font-size: 14px; font-weight: 500; color: #1a1a1a; flex: 1; }
+  .week-dates { font-family: 'DM Mono', monospace; font-size: 11px; color: #bbb; }
+  .chevron { font-size: 10px; color: #ccc; transition: transform 0.2s; }
+  .week-body { border-top: 1px solid #F0EEE8; padding: 4px 16px 8px; display: none; }
+  .week-body.open { display: block; }
+  .day { display: grid; grid-template-columns: 90px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F5F4F0; align-items: start; }
+  .day:last-child { border-bottom: none; }
+  .day.today { background: #F5F3FF; border-radius: 8px; padding: 8px 10px; margin: 4px -10px; border-bottom: none; }
+  .day-name { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: #aaa; padding-top: 2px; line-height: 1.4; }
+  .day.today .day-name { color: #6D28D9; }
+  .today-pill { display: inline-block; background: #6D28D9; color: white; font-size: 9px; padding: 1px 5px; border-radius: 6px; margin-left: 4px; vertical-align: middle; letter-spacing: 0.03em; }
+  .day-task { font-size: 13px; color: #2a2a2a; line-height: 1.55; }
+  .day.today .day-task { color: #1a1a1a; font-weight: 500; }
+  .pt-row .day-task { font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>LSAT Study Plan</h1>
+  <div class="subtitle">Jay &mdash; Aug 8, 2026 &mdash; 14 weeks</div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">14</div><div class="stat-label">weeks</div></div>
+    <div class="stat"><div class="stat-num">45</div><div class="stat-label">min/day</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-label">practice tests</div></div>
+  </div>
+
+  <div class="legend">
+    <span class="tag tag-book" style="margin-left:0;">Book</span> PowerScore RC &nbsp;
+    <span class="tag tag-rc">RC</span> 7Sage passages &nbsp;
+    <span class="tag tag-lr">LR</span> Mixed LR drills &nbsp;
+    <span class="tag tag-condr">CondR</span> CondR-targeted &nbsp;
+    <span class="tag tag-pt">PT</span> Practice Test &nbsp;
+    <span class="tag tag-review">Review</span> Post-session &nbsp;
+    <span class="tag tag-rest">Rest</span>
+  </div>
+
+  <!-- PHASE 1 -->
+  <div class="phase-label">Phase 1 — RC foundation + LR rebuild &middot; May 1 – May 28</div>
+  <div class="phase-note">Two LR sessions/week: Sundays = CondR-targeted, Tuesdays = mixed LR. RC reading on weekdays, drilling on weekends.</div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 01</span><span class="week-title">Chs 1–5: how to read + LR begins</span>
+      <span class="week-dates">May 1–7</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body open">
+      <div class="day today">
+        <div class="day-name">Fri May 1<span class="today-pill">today</span></div>
+        <div class="day-task">Ch 1 + Ch 2: intro and RC basics. Do the Active Reading Drill (p.35). <span class="tag tag-book">Book</span></div>
+      </div>
+      <div class="day"><div class="day-name">Sat May 2</div><div class="day-task">Ch 3: VIEWSTAMP. Most important chapter. Take notes, do all drills. <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sun May 3</div><div class="day-task">Finish Ch 3 if needed. Ch 4: Passage Elements &amp; Formations. Do recognition drill (p.141). <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Mon May 4</div><div class="day-task">20 untimed CondR questions on 7Sage — multi-link chains only. Bring misses to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Tue May 5</div><div class="day-task">Ch 5: Tracking Information. Study all 3 diagramming examples (pp.172–174). Pick your approach. <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Wed May 6</div><div class="day-task">20 untimed mixed LR (all types). Let 7Sage analytics surface what's slipping. Bring misses to Claude. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu May 7</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 02</span><span class="week-title">Ch 6: questions + drilling both sections</span>
+      <span class="week-dates">May 8–14</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri May 8</div><div class="day-task">Ch 6 pt 1 (pp.179–200): question stems, location element, types overview. Do Location Designation Drill (p.183). <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sat May 9</div><div class="day-task">Ch 6 pt 2 (pp.201–246): Must Be True, Strengthen, Weaken, all subtypes. Do Identify the Question Stem Drill (p.191). <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sun May 10</div><div class="day-task">2 untimed 7Sage RC passages. Apply question type recognition from Ch 6. Bring misses to Claude. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon May 11</div><div class="day-task">20 untimed CondR — Inverse Fallacy and contrapositive chains. Bring misses to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Tue May 12</div><div class="day-task">Ch 7: Putting It All Together (pp.249–289). Do both practice passages (PT 122 + PT 121). <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Wed May 13</div><div class="day-task">20 untimed mixed LR. Are the same question types slipping week over week? Bring to Claude. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu May 14</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 03</span><span class="week-title">Chs 8–9: comparative + passage themes</span>
+      <span class="week-dates">May 15–21</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri May 15</div><div class="day-task">Ch 8: Comparative Reading (pp.291–329). Do both comparative practice passages. <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sat May 16</div><div class="day-task">Ch 9 pt 1 (pp.331–373): Diversity + Law passages. Do diversity practice (p.348) and law practice (p.365). <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sun May 17</div><div class="day-task">Ch 9 pt 2 (pp.375–399): Science passages. Do science practice (p.389). Then 1 untimed 7Sage science passage. <span class="tag tag-book">Book</span> <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon May 18</div><div class="day-task">20 untimed CondR — CausR traps (correlation, reverse causation, alternative cause, confounding variable). Bring misses to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Tue May 19</div><div class="day-task">3 untimed 7Sage RC passages — mix of all passage types. Passage map required for each. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Wed May 20</div><div class="day-task">20 untimed mixed LR. Identify if same question types keep slipping. Bring pattern to Claude. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu May 21</div><div class="day-task">Ch 10: Section Strategy &amp; Management (pp.401–431). Study "Plus 2" Timing Formula and pacing guidelines carefully. <span class="tag tag-book">Book</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 04</span><span class="week-title">Ch 10 + PT #1</span>
+      <span class="week-dates">May 22–28</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri May 22</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Sat May 23</div><div class="day-task">20 untimed CondR — last targeted session before PT #1. How are the chains feeling? <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun May 24</div><div class="day-task">Practice Test #1 — full timed PT. Home, ethernet, phone off. First real benchmark. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon May 25</div><div class="day-task">PT #1 review — score it, categorize every miss by section and type. Full breakdown to Claude. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue May 26</div><div class="day-task">Targeted drilling on PT #1 weak areas. Claude will direct. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed May 27</div><div class="day-task">20 untimed mixed LR. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu May 28</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-label">Phase 2 — timed sections + full LR reintegration &middot; May 29 – Jul 2</div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 05</span><span class="week-title">First timed RC + timed LR</span>
+      <span class="week-dates">May 29 – Jun 4</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri May 29</div><div class="day-task">Timed RC section (35 min). Keep passage mapping — just do it faster. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat May 30</div><div class="day-task">Review timed RC. Where did time go? Which passage hurt most? Bring to Claude. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Sun May 31</div><div class="day-task">Timed RC section. Target ~8 min per passage. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon Jun 1</div><div class="day-task">Timed LR section (35 min). Note which question types slow you down. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Tue Jun 2</div><div class="day-task">25 untimed CondR — are the chains clicking under untimed conditions? Bring misses to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Wed Jun 3</div><div class="day-task">Review both timed sections from weekend. Categorize all misses. Bring to Claude. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Thu Jun 4</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 06</span><span class="week-title">Stamina + PT #2</span>
+      <span class="week-dates">Jun 5–11</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jun 5</div><div class="day-task">Timed RC section. Try to finish with 2 min to spare — skip and return if stuck. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat Jun 6</div><div class="day-task">25 untimed mixed LR. Target 90%+ accuracy. Bring misses to Claude. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun Jun 7</div><div class="day-task">Practice Test #2 — full timed PT. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon Jun 8</div><div class="day-task">PT #2 review — full breakdown to Claude. Compare to PT #1. Is LR floor rising? <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue Jun 9</div><div class="day-task">Targeted drilling on PT #2 weak areas. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed Jun 10</div><div class="day-task">Timed LR section. Track anything over 90 sec. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu Jun 11</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 07</span><span class="week-title">RC mapping speed + ReChallenge</span>
+      <span class="week-dates">Jun 12–18</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jun 12</div><div class="day-task">2 timed RC passages. Target: under 9 min each. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat Jun 13</div><div class="day-task">PowerScore RC Passage ReChallenge (p.435) — redo the book's passages under timed conditions. <span class="tag tag-book">Book</span></div></div>
+      <div class="day"><div class="day-name">Sun Jun 14</div><div class="day-task">Timed RC section. Is your mapping getting leaner? <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon Jun 15</div><div class="day-task">Timed LR section + full review. Bring misses to Claude. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Tue Jun 16</div><div class="day-task">25 untimed CondR — whatever chain or fallacy type is still slipping. Bring to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Wed Jun 17</div><div class="day-task">Review week's RC misses. Comprehension or question-type errors? Bring to Claude. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Thu Jun 18</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 08</span><span class="week-title">PT #3 — midpoint check</span>
+      <span class="week-dates">Jun 19–25</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jun 19</div><div class="day-task">Timed RC section. Aim to finish with time to check answers. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat Jun 20</div><div class="day-task">Timed LR section. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun Jun 21</div><div class="day-task">Practice Test #3 — full timed PT. Midpoint benchmark. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon Jun 22</div><div class="day-task">PT #3 full review — bring to Claude. Are we trending toward 162? <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue Jun 23</div><div class="day-task">Targeted drilling based on PT #3 misses. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed Jun 24</div><div class="day-task">Light mixed LR — 15 questions, untimed, confidence only. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu Jun 25</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 09</span><span class="week-title">Section stamina</span>
+      <span class="week-dates">Jun 26 – Jul 2</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jun 26</div><div class="day-task">Back-to-back timed sections: RC then LR with 10-min break. Build multi-section stamina. <span class="tag tag-rc">RC</span> <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Sat Jun 27</div><div class="day-task">Review both sections. Where did errors cluster — early, middle, or late? <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Sun Jun 28</div><div class="day-task">Back-to-back: LR then RC. Does order affect which section suffers? <span class="tag tag-lr">LR</span> <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon Jun 29</div><div class="day-task">25 untimed CondR — any persistent chain errors from Phase 2. Bring to Claude. <span class="tag tag-condr">CondR</span></div></div>
+      <div class="day"><div class="day-name">Tue Jun 30</div><div class="day-task">Untimed RC passages — comprehension focus only. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Wed Jul 1</div><div class="day-task">Bring week's misses to Claude for pattern diagnosis. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Thu Jul 2</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-label">Phase 3 — full test simulation &middot; Jul 3 – Aug 5</div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 10</span><span class="week-title">PT #4</span>
+      <span class="week-dates">Jul 3–9</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jul 3</div><div class="day-task">Timed LR section. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Sat Jul 4</div><div class="day-task">Rest — holiday. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun Jul 5</div><div class="day-task">Practice Test #4 — full timed PT. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon Jul 6</div><div class="day-task">PT #4 full review — bring to Claude. Scores stabilizing above 160? <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue Jul 7</div><div class="day-task">Targeted drilling on PT #4 misses. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed Jul 8</div><div class="day-task">Timed RC section. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Thu Jul 9</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 11</span><span class="week-title">PT #5</span>
+      <span class="week-dates">Jul 10–16</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jul 10</div><div class="day-task">Mixed timed drilling — 20 LR + 1 timed RC passage. <span class="tag tag-lr">LR</span> <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat Jul 11</div><div class="day-task">Untimed drilling on persistent weak areas. <span class="tag tag-review">Review</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun Jul 12</div><div class="day-task">Practice Test #5 — full timed PT. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon Jul 13</div><div class="day-task">PT #5 full review — bring to Claude. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue Jul 14</div><div class="day-task">Targeted drilling on PT #5 misses. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed Jul 15</div><div class="day-task">Timed LR section. Skip and return on anything over 90 sec. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu Jul 16</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 12</span><span class="week-title">PT #6 — final full PT</span>
+      <span class="week-dates">Jul 17–23</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jul 17</div><div class="day-task">Timed RC section. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sat Jul 18</div><div class="day-task">Timed LR section. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day pt-row"><div class="day-name">Sun Jul 19</div><div class="day-task">Practice Test #6 — treat exactly like test day. Final full PT. <span class="tag tag-pt">PT</span></div></div>
+      <div class="day"><div class="day-name">Mon Jul 20</div><div class="day-task">PT #6 full review — final diagnostic. What's left to fix? <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Tue Jul 21</div><div class="day-task">Targeted drilling on PT #6 misses. No new strategies — fix known errors only. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Wed Jul 22</div><div class="day-task">Light mixed LR, untimed. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Thu Jul 23</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 13</span><span class="week-title">Sharpen, don't rebuild</span>
+      <span class="week-dates">Jul 24–30</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jul 24</div><div class="day-task">Targeted drilling on whatever PT #6 exposed. Bring to Claude first. <span class="tag tag-review">Review</span></div></div>
+      <div class="day"><div class="day-name">Sat Jul 25</div><div class="day-task">Timed LR section. Goal: no rushing at the end. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Sun Jul 26</div><div class="day-task">Timed RC section. Goal: complete all 4 passages. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Mon Jul 27</div><div class="day-task">20 untimed LR — confidence reps only. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Tue Jul 28</div><div class="day-task">2 untimed RC passages. No pressure. Stay sharp. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Wed Jul 29</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Thu Jul 30</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-label">Phase 4 — test week &middot; Jul 31 – Aug 8</div>
+
+  <div class="week">
+    <div class="week-header" onclick="toggle(this)">
+      <span class="week-num">WK 14</span><span class="week-title">Final week + test day</span>
+      <span class="week-dates">Jul 31 – Aug 8</span><span class="chevron">&#9660;</span>
+    </div>
+    <div class="week-body">
+      <div class="day"><div class="day-name">Fri Jul 31</div><div class="day-task">15 untimed LR — easy questions, confidence only. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Sat Aug 1</div><div class="day-task">1 untimed RC passage. Light. Done in 20 min. <span class="tag tag-rc">RC</span></div></div>
+      <div class="day"><div class="day-name">Sun Aug 2</div><div class="day-task">10 untimed LR — stay warm. <span class="tag tag-lr">LR</span></div></div>
+      <div class="day"><div class="day-name">Mon Aug 3</div><div class="day-task">Rest. Confirm test day logistics: ethernet, headphones, ID, water. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Tue Aug 4</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Wed Aug 5</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Thu Aug 6</div><div class="day-task">Rest. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day"><div class="day-name">Fri Aug 7</div><div class="day-task">No studying. Sleep early. Done. <span class="tag tag-rest">Rest</span></div></div>
+      <div class="day" style="padding-top:10px; padding-bottom:10px;">
+        <div class="day-name" style="color:#6D28D9; font-weight:500;">Sat Aug 8</div>
+        <div class="day-task" style="font-weight:600; font-size:14px;">Test day. Fordham.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
+}
+</script>
+</body>
+</html>
